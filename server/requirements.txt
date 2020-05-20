@@ -1,0 +1,5 @@
+aiohttp==3.5.4
+APScheduler==3.6.3
+motor==2.1.0
+ujson==1.35
+pytz==2020.1
