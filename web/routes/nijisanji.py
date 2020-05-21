@@ -8,6 +8,7 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_nijibili,
+    fetch_nilive_data,
     parse_uuids_args,
 )
 from utils.models import BiliChannelsModel, BiliScheduleModel
@@ -15,16 +16,16 @@ from utils.models import BiliChannelsModel, BiliScheduleModel
 nijibp = Blueprint("Nijisanji", "/nijisanji", strict_slashes=True)
 
 
-@nijibp.get("/upcoming")
-@doc.summary("Upcoming Nijisanji streams")
+@nijibp.get("/live")
+@doc.summary("Live/Upcoming Nijisanji streams")
 @doc.description(
-    "Fetch a list of upcoming streams from Nijisanji/VirtuaReal VTubers"
-    ", updated every 4 minutes via cronjob."
+    "Fetch a list of live/upcoming streams from Nijisanji/VirtuaReal VTubers"
+    ", updated every 2/4 minutes via cronjob."
 )
 @doc.consumes(
     doc.String(
         name="uids",
-        description="Filter results with User ID "
+        description="Filter upcoming results with User ID "
         "(support multiple id separated by comma)",
     ),
     location="query",
@@ -39,11 +40,17 @@ nijibp = Blueprint("Nijisanji", "/nijisanji", strict_slashes=True)
     description="A list of upcoming streams",
     content_type="application/json",
 )
-async def nijiupcoming_api(request):
+async def nijiliveup_api(request):
     logger.info(f"Requested {request.path} data")
     upcoming_results = await fetch_data("nijibili", fetch_nijibili)
+    upcoming_results = await parse_uuids_args(request.args, upcoming_results)
+    lives_results = await fetch_data("liveniji", fetch_nilive_data)
     return json(
-        await parse_uuids_args(request.args, upcoming_results),
+        {
+            "live": lives_results["live"],
+            "upcoming": upcoming_results["upcoming"],
+            "cached": True,
+        },
         dumps=ujson.dumps,
         ensure_ascii=False,
     )
