@@ -131,7 +131,7 @@ async def fetch_bili_calendar():
     return final_dataset
 
 
-async def hololive_main(DatabaseConn: VTBiliDatabase):
+async def nijisanji_main(DatabaseConn: VTBiliDatabase):
     vtlog.info("Fetching bili calendar data...")
     calendar_data = await fetch_bili_calendar()
 
