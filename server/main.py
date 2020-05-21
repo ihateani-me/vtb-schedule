@@ -5,7 +5,6 @@ import os
 import sys
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from motor.motor_asyncio import AsyncIOMotorClient
 
 from jobs import (
     hololive_main,
@@ -15,6 +14,7 @@ from jobs import (
     youtube_live_heartbeat,
     youtube_video_feeds,
 )
+from jobs.utils import Jetri, VTBiliDatabase
 
 BASE_FOLDER_PATH = "./"  # Modify this
 MONGODB_URI = "mongodb://127.0.0.1:12345"  # Modify this
@@ -43,11 +43,13 @@ if __name__ == "__main__":
     console.setFormatter(formatter1)
     vtlog.addHandler(console)
 
+    vtlog.info("Opening new loop!")
+    loop_de_loop = asyncio.get_event_loop()
+    jetri_co = Jetri(loop_de_loop)
     vtlog.info(
         f"Connecting to database using: {MONGODB_URI} ({MONGODB_DBNAME})"
     )
-    dbclient = AsyncIOMotorClient(MONGODB_URI)
-    vtbilidb = dbclient[MONGODB_DBNAME]
+    vtbili_db = VTBiliDatabase(MONGODB_URI, MONGODB_DBNAME)
     vtlog.info("Connected!")
 
     vtlog.info("Initiating scheduler...")
@@ -63,13 +65,13 @@ if __name__ == "__main__":
     scheduler.add_job(
         hololive_main,
         "interval",
-        kwargs={"DatabaseConn": vtbilidb},
+        kwargs={"DatabaseConn": vtbili_db},
         minutes=INTERVAL_BILI_LIVE,
     )
     scheduler.add_job(
         nijisanji_main,
         "interval",
-        kwargs={"DatabaseConn": vtbilidb},
+        kwargs={"DatabaseConn": vtbili_db},
         minutes=INTERVAL_BILI_LIVE,
     )
 
@@ -80,7 +82,7 @@ if __name__ == "__main__":
     scheduler.add_job(
         others_main,
         "interval",
-        kwargs={"DatabaseConn": vtbilidb, "dataset_path": others_dataset},
+        kwargs={"DatabaseConn": vtbili_db, "dataset_path": others_dataset},
         minutes=INTERVAL_BILI_LIVE,
     )
 
@@ -91,7 +93,7 @@ if __name__ == "__main__":
     scheduler.add_job(
         update_channels_stats,
         "interval",
-        kwargs={"DatabaseConn": vtbilidb, "dataset_set": dataset_all},
+        kwargs={"DatabaseConn": vtbili_db, "dataset_set": dataset_all},
         minutes=INTERVAL_BILI_CHANNELS,
     )
 
@@ -103,8 +105,7 @@ if __name__ == "__main__":
         youtube_video_feeds,
         "interval",
         kwargs={
-            "mongodb_url": MONGODB_URI,
-            "mongodb_name": MONGODB_DBNAME,
+            "DatasetConn": vtbili_db,
             "dataset": others_yt_dataset,
             "yt_api_key": YT_API_KEY,
         },
@@ -114,25 +115,17 @@ if __name__ == "__main__":
     scheduler.add_job(
         youtube_live_heartbeat,
         "interval",
-        kwargs={
-            "mongodb_url": MONGODB_URI,
-            "mongodb_name": MONGODB_DBNAME,
-            "yt_api_key": YT_API_KEY,
-        },
+        kwargs={"DatabaseConn": vtbili_db, "yt_api_key": YT_API_KEY},
         minutes=INTERVAL_YT_LIVE,
     )
 
-    vtlog.info("Opening new loop!")
-    loop_de_loop = asyncio.get_event_loop()
     vtlog.info("Doing first run!")
     jobs_data = [
-        asyncio.ensure_future(hololive_main(vtbilidb)),
-        asyncio.ensure_future(nijisanji_main(vtbilidb)),
-        asyncio.ensure_future(others_main(vtbilidb, others_dataset)),
-        asyncio.ensure_future(update_channels_stats(vtbilidb, dataset_all)),
-        asyncio.ensure_future(
-            youtube_live_heartbeat(MONGODB_URI, MONGODB_DBNAME, YT_API_KEY)
-        ),
+        asyncio.ensure_future(hololive_main(vtbili_db)),
+        asyncio.ensure_future(nijisanji_main(vtbili_db)),
+        asyncio.ensure_future(others_main(vtbili_db, others_dataset)),
+        asyncio.ensure_future(update_channels_stats(vtbili_db, dataset_all)),
+        asyncio.ensure_future(youtube_live_heartbeat(vtbili_db, YT_API_KEY)),
         asyncio.ensure_future(
             youtube_video_feeds(
                 MONGODB_URI, MONGODB_DBNAME, others_yt_dataset, YT_API_KEY
@@ -147,6 +140,7 @@ if __name__ == "__main__":
         loop_de_loop.run_forever()
     except (KeyboardInterrupt, SystemExit):
         vtlog.info("CTRL+C Called, stopping everything...")
+        loop_de_loop.run_until_complete(jetri_co.close())
         loop_de_loop.stop()
         loop_de_loop.close()
 

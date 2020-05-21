@@ -3,7 +3,7 @@ from datetime import datetime
 
 import aiohttp
 import pytz
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from .utils import VTBiliDatabase
 
 vtlog = logging.getLogger("nijisanji")
 
@@ -86,18 +86,6 @@ async def requests_data(url, params):
     return json_results
 
 
-async def update_db(db, upcoming_data):
-    upd = {"$set": {"upcoming": upcoming_data, "cached": True}}
-    upcoming_coll = db["upcoming_niji_data"]
-    vtlog.debug("\tSending data...")
-    res = await upcoming_coll.update_one({}, upd)
-    if res.acknowledged:
-        vtlog.info("\tUpdated!")
-        return True
-    vtlog.error("\tFailed to update...")
-    return False
-
-
 async def fetch_bili_calendar():
     vtlog.debug(f"Total Nijisanji BiliBili IDs: {len(NIJI_BILI_UIDS)}")
     vtubers_uids = ",".join(NIJI_BILI_UIDS)
@@ -143,9 +131,10 @@ async def fetch_bili_calendar():
     return final_dataset
 
 
-async def nijisanji_main(DatabaseConn: AsyncIOMotorDatabase):
+async def hololive_main(DatabaseConn: VTBiliDatabase):
     vtlog.info("Fetching bili calendar data...")
     calendar_data = await fetch_bili_calendar()
 
     vtlog.info("Updating database...")
-    await update_db(DatabaseConn, calendar_data)
+    upd_data = {"upcoming": calendar_data, "cached": True}
+    await DatabaseConn.update_data("upcoming_niji_data", upd_data)

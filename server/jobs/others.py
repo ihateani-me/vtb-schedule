@@ -3,76 +3,11 @@ from datetime import datetime
 
 import aiohttp
 import pytz
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from .utils import VTBiliDatabase
 
 import ujson
 
 vtlog = logging.getLogger("others")
-
-NIJI_BILI_UIDS = [
-    "434565011",
-    "434563934",
-    "434563422",
-    "436596837",
-    "436596839",
-    "403921378",
-    "477780496",
-    "441666968",
-    "441666967",
-    "511613154",
-    "403928672",
-    "436596836",
-    "403927583",
-    "410455162",
-    "458154141",
-    "434564604",
-    "403930401",
-    "477780497",
-    "458154144",
-    "436596840",
-    "458154140",
-    "458154139",
-    "477780499",
-    "436596838",
-    "458154143",
-    "458154142",
-    "436596841",
-    "477780498",
-    "488976342",
-    "421267475",
-    "420249427",
-    "434334701",
-    "434341786",
-    "434401868",
-    "455916618",
-    "455965041",
-    "472845978",
-    "472821519",
-    "472877684",
-    "477317922",
-    "477342747",
-    "477306079",
-    "480675481",
-    "480680646",
-    "480745939",
-    "474369808",
-    "319810877",
-    "490331391",
-    "56748733",
-    "370688671",
-    "370689338",
-    "370687372",
-    "370687588",
-    "370689210",
-    "392505232",
-    "471308347",
-    "36795838",
-    "98181",
-    "1750561",
-    "322210278",
-    "474113504",
-    "282994",
-]
 
 
 async def requests_data(url, params):
@@ -86,18 +21,6 @@ async def requests_data(url, params):
             vtlog.debug("\tGetting results...")
             json_results = await resp.json()
     return json_results
-
-
-async def update_db(db, upcoming_data):
-    upd = {"$set": {"upcoming": upcoming_data, "cached": True}}
-    upcoming_coll = db["upcoming_other_data"]
-    vtlog.debug("\tSending data...")
-    res = await upcoming_coll.update_one({}, upd)
-    if res.acknowledged:
-        vtlog.info("\tUpdated!")
-        return True
-    vtlog.error("\tFailed to update...")
-    return False
 
 
 async def fetch_bili_calendar(VTBS_UIDS):
@@ -145,7 +68,7 @@ async def fetch_bili_calendar(VTBS_UIDS):
     return final_dataset
 
 
-async def others_main(DatabaseConn: AsyncIOMotorDatabase, dataset_path: str):
+async def others_main(DatabaseConn: VTBiliDatabase, dataset_path: str):
     with open(dataset_path, "r", encoding="utf-8") as fp:
         CHAN_BILIBILI = ujson.load(fp)
 
@@ -154,4 +77,5 @@ async def others_main(DatabaseConn: AsyncIOMotorDatabase, dataset_path: str):
     calendar_data = await fetch_bili_calendar(CHAN_BILI_UIDS)
 
     vtlog.info("Updating database...")
-    await update_db(DatabaseConn, calendar_data)
+    upd_data = {"upcoming": calendar_data, "cached": True}
+    await DatabaseConn.update_data("upcoming_other_data", upd_data)

@@ -5,68 +5,9 @@ from datetime import datetime
 
 import aiohttp
 import feedparser
-import motor.motor_asyncio
+from .utils import VTBiliDatabase
 
 import ujson
-
-
-class DatabaseDriver:
-    def __init__(self, mongodb_url, mongodb_dbname="vtbili"):
-        self.logger = logging.getLogger("vtbili_dbconn")
-        self.logger.info("Connecting to database...")
-        self._dbclient = motor.motor_asyncio.AsyncIOMotorClient(mongodb_url)
-        self._holodb = self._dbclient[mongodb_dbname]
-        self._locked = False
-        self.logger.info("Connected!")
-
-    @property
-    def is_locked(self):
-        return self._locked
-
-    async def acquire(self):
-        while True:
-            if not self._locked:
-                break
-            asyncio.sleep(1)
-        self._locked = True
-
-    async def release(self):
-        self._locked = False
-
-    async def update_all(self, yt_dataset):
-        upd = {"$set": yt_dataset}
-        coll = self._holodb["yt_other_livedata"]
-        self.logger.debug("\tSending data...")
-        await self.acquire()
-        res = await coll.update_one({}, upd)
-        await self.release()
-        if res.acknowledged:
-            self.logger.info("\tUpdated!")
-            return True
-        self.logger.error("\tFailed to update...")
-        return False
-
-    async def update_fetched(self, videos_id):
-        upd = {"$set": {"ids": videos_id}}
-        coll = self._holodb["yt_other_videoids"]
-        self.logger.debug("\tSending data...")
-        await self.acquire()
-        res = await coll.update_one({}, upd)
-        await self.release()
-        if res.acknowledged:
-            self.logger.info("\tUpdated!")
-            return True
-        self.logger.error("\tFailed to update...")
-        return False
-
-    async def fetch_db(self, key):
-        channels_coll = self._holodb[key]
-        self.logger.debug("\tFetching data...")
-        await self.acquire()
-        cur = channels_coll.find({})
-        data = list(await cur.to_list(length=100))
-        await self.release()
-        return data[0]
 
 
 async def fetch_xmls(
@@ -91,11 +32,10 @@ async def fetch_apis(
 
 
 async def youtube_video_feeds(
-    mongodb_url: str, mongodb_name: str, dataset: str, yt_api_key: str
+    DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: str
 ):
     vtlog = logging.getLogger("yt_videos_feeds")
     sessions = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.4.0"})
-    vtdb = DatabaseDriver(mongodb_url, mongodb_name)
     ytid_re = re.compile(r"yt\:video\:(?P<ids>.*)")
 
     vtlog.debug("Opening dataset")
@@ -103,9 +43,9 @@ async def youtube_video_feeds(
         channels_dataset = ujson.load(fp)
 
     vtlog.info("Fetching all fetched video IDs...")
-    fetched_video_ids = await vtdb.fetch_db("yt_other_videoids")
+    fetched_video_ids = await DatabaseConn.fetch_data("yt_other_videoids")
     fetched_video_ids: list = fetched_video_ids["ids"]
-    youtube_lives_data = await vtdb.fetch_db("yt_other_livedata")
+    youtube_lives_data = await DatabaseConn.fetch_data("yt_other_livedata")
     del youtube_lives_data["_id"]
 
     vtlog.info("Creating job task for xml files.")
@@ -201,23 +141,24 @@ async def youtube_video_feeds(
         youtube_lives_data[ch_id] = youtube_videos_data
         vtlog.warn(youtube_lives_data[ch_id])
         vtlog.info(f"|== Updating database ({ch_id})...")
-        await vtdb.update_channel(ch_id, youtube_videos_data)
+        upd_data = {ch_id: youtube_videos_data}
+        await DatabaseConn.update_data("yt_other_livedata", upd_data)
 
     vtlog.info("Updating fetched IDs database..")
-    await vtdb.update_fetched(fetched_video_ids)
+    upd_data = {"ids": fetched_video_ids}
+    await DatabaseConn.update_data("yt_other_videoids", upd_data)
     await sessions.close()
 
 
 async def youtube_live_heartbeat(
-    mongodb_url: str, mongodb_name: str, yt_api_key: str
+    DatabaseConn: VTBiliDatabase, yt_api_key: str
 ):
     vtlog = logging.getLogger("yt_live_heartbeat")
     session = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.4.0"})
 
     vtlog.info("Fetching live data...")
 
-    vtdb = DatabaseDriver(mongodb_url, mongodb_name)
-    youtube_lives_data = await vtdb.fetch_db("yt_other_livedata")
+    youtube_lives_data = await DatabaseConn.fetch_data("yt_other_livedata")
     del youtube_lives_data["_id"]
 
     videos_list = []
@@ -282,4 +223,4 @@ async def youtube_live_heartbeat(
         youtube_lives_data[channel_id] = new_streams_data
 
     vtlog.info("|-- Updating database...")
-    await vtdb.update_all(youtube_lives_data)
+    await DatabaseConn.update_data("yt_other_livedata", youtube_lives_data)
