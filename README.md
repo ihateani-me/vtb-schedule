@@ -1,7 +1,6 @@
 # VTBili Schedule API and Webserver
 A wrapper around BiliBili Calendar (Scheduling system) into a readable API.<br>
-(Oh, also some Youtube channels, I guess)
-
+*(Oh, also some Youtube channels, I guess)*
 
 Still WIP!
 
