@@ -26,7 +26,7 @@ class VTBiliDatabase:
         while True:
             if not self._locked:
                 break
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
         self._locked = True
         self.logger.debug("\tLock acquired.")
 
