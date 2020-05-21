@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 import aiohttp
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from .utils import VTBiliDatabase
 
 import ujson
 
@@ -30,25 +30,6 @@ async def find_channel_info(item_list, channel_data):
             cd = item
             break
     return cd, channel_data["id"], channel_data["num"]
-
-
-async def update_db(db, final_data):
-    upd = {
-        "$set": {
-            "hololive": final_data["hololive"],
-            "nijisanji": final_data["nijisanji"],
-            "other": final_data["other"],
-            "cached": True,
-        }
-    }
-    channels_coll = db["channel_data"]
-    vtlog.debug("\tSending data...")
-    res = await channels_coll.update_one({}, upd)
-    if res.acknowledged:
-        vtlog.info("\tUpdated!")
-        return True
-    vtlog.error("\tFailed to update...")
-    return False
 
 
 async def main_process_loop(channels_uids):
@@ -141,7 +122,7 @@ async def main_process_loop(channels_uids):
 
 
 async def update_channels_stats(
-    DatabaseConn: AsyncIOMotorDatabase, dataset_set: list
+    DatabaseConn: VTBiliDatabase, dataset_set: list
 ):
     vtlog.info("Collecting channel UUIDs")
     channels_uids = []
@@ -156,4 +137,4 @@ async def update_channels_stats(
     vtlog.info("Processing...")
     final_data = await main_process_loop(channels_uids)
     vtlog.info("Updating DB data...")
-    await update_db(DatabaseConn, final_data)
+    await DatabaseConn.update_data("channel_data", final_data)
