@@ -46,8 +46,9 @@ the new [BiliBili scheduling system](https://live.bilibili.com/p/html/live-web-c
 
 This API are updating automatically using cronjob:
 \- **Every 1 minute** for YouTube Live Streams data.
-\- **Every 3 minutes** for YouTube Upcoming Streams data.
-\- **Every 4 minutes** for Upcoming Streams data.
+\- **Every 2 minutes** for YouTube Upcoming Streams data.
+\- **Every 2 minutes** for BiliBili Live Streams data.
+\- **Every 4 minutes** for BiliBili Upcoming Streams data.
 \- **Every 6 hours** for Channels Info/Stats.<br><br>"""  # noqa: W605,E501
 API_DESC_LIMIT = """This API also implement a Rate Limiting:
 \- **3 requests** per **minute**
@@ -84,10 +85,10 @@ Supported currently are:<br>
 - Other VTuber<br>
 <br>
 Endpoint:<br>
+- <a href="/live">`/live`</a> for Hololivers Live/Upcoming Bili streams<br>
 - <a href="/channels">`/channels`</a> for Hololivers BiliBili channels stats<br>
-- <a href="/upcoming">`/upcoming`</a> for Hololivers Upcoming Bili streams<br>
+- <a href="/nijisanji/live">`/nijisanji/live`</a> for Nijisanji Live/Upcoming Bili streams<br>
 - <a href="/nijisanji/channels">`/nijisanji/channels`</a> for Nijisanji BiliBili channels stats<br>
-- <a href="/nijisanji/upcoming">`/nijisanji/upcoming`</a> for Nijisanji Upcoming Bili streams<br>
 - <a href="/other/upcoming">`/other/upcoming`</a> for Other VTuber<br>
 - <a href="/other/channels">`/other/channels`</a> to check supported "Other VTuber"<br>
 - <a href="/other/yt/live">`/other/yt/live`</a> to see upcoming/live for some other vtuber.<br>
@@ -98,8 +99,9 @@ Dataset Used:<br>
 <br>
 Refresh/Cache Rate:<br>
 - Channels: Every 6 hours<br>
-- Upcoming (Bili): Every 4 minutes (might be faster later.)<br>
-- Upcoming (YT): Every 3 minutes<br>
+- Upcoming (Bili): Every 4 minutes<br>
+- Live (Bili): Every 2 minutes<br>
+- Upcoming (YT): Every 2 minutes<br>
 - Live (YT): Every 1 minute<br>
 <br>
 Rate Limiting [If activated]:<br>
