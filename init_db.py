@@ -41,6 +41,23 @@ async def initialize_vtbili():
         return 1
     print("|-- $ Success")
 
+    print("|= Initializing Live Data")
+    print("|--> HoloLive")
+    holo_live = dbconn["live_data"]
+    result = await holo_live.insert_one({"live": [], "cached": False})
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
+    print("|--> Nijisanji")
+    niji_live = dbconn["live_niji_data"]
+    result = await niji_live.insert_one({"live": [], "cached": False})
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
     print("|= Initializing Channels Data")
     chan_coll = dbconn["channel_data"]
     result = await chan_coll.insert_one(
