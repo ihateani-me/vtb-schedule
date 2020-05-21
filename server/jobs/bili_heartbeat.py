@@ -55,12 +55,17 @@ async def holo_heartbeat(
             "title": room_data["title"],
             "startTime": start_time,
             "channel": str(room_data["uid"]),
-            "channel_name": holo_data[str(room_data["uid"])]["name"],
+            "channel_name": holo_data[str(room_id)]["name"],
         }
         final_results.append(dd)
 
     if not final_results:
-        vtlog.warn("No live currently happening, bailing!")
+        vtlog.warn("No live currently happening, checking database...")
+        current_lives = await DatabaseConn.fetch_data("live_data")
+        if current_lives["live"]:
+            vtlog.warn("There's live happening right now, flushing...")
+            await DatabaseConn.update_data("live_data", {"live": [], "cached": True})
+        vtlog.warn("Bailing!")
         await session.close()
         return 1
 
@@ -122,12 +127,17 @@ async def niji_heartbeat(
             "title": room_data["title"],
             "startTime": start_time,
             "channel": str(room_data["uid"]),
-            "channel_name": niji_data[str(room_data["uid"])]["name"],
+            "channel_name": niji_data[str(room_id)]["name"],
         }
         final_results.append(dd)
 
     if not final_results:
-        vtlog.warn("No live currently happening, bailing!")
+        vtlog.warn("No live currently happening, checking database...")
+        current_lives = await DatabaseConn.fetch_data("live_niji_data")
+        if current_lives["live"]:
+            vtlog.warn("There's live happening right now, flushing...")
+            await DatabaseConn.update_data("live_niji_data", {"live": [], "cached": True})
+        vtlog.warn("Bailing!")
         await session.close()
         return 1
 
