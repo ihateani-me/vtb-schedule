@@ -15,10 +15,10 @@ from sanic_motor import BaseModel
 from sanic_openapi import doc, swagger_blueprint
 
 import ujson
-from routes.hololive import holobp
-from routes.nijisanji import nijibp
-from routes.others import otherbp
-from utils.memcache import MemcachedBridge
+from .routes.hololive import holobp
+from .routes.nijisanji import nijibp
+from .routes.others import otherbp
+from .utils.memcache import MemcachedBridge
 
 RANDOMIZED_UUID_API = str(uuid4())
 
