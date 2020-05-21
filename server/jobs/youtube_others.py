@@ -154,7 +154,7 @@ async def youtube_live_heartbeat(
     DatabaseConn: VTBiliDatabase, yt_api_key: str
 ):
     vtlog = logging.getLogger("yt_live_heartbeat")
-    session = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.4.0"})
+    session = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.5.0"})
 
     vtlog.info("Fetching live data...")
 
