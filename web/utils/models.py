@@ -7,27 +7,37 @@ from sanic_openapi import doc
 
 class HoloBiliDB(BaseModel):
     __coll__ = "upcoming_data"
-    __motor_db__ = "holobili"
+    __motor_db__ = "vtbili"
 
 
 class NijiBiliDB(BaseModel):
     __coll__ = "upcoming_niji_data"
-    __motor_db__ = "holobili"
+    __motor_db__ = "vtbili"
 
 
 class OtherBiliDB(BaseModel):
     __coll__ = "upcoming_other_data"
-    __motor_db__ = "holobili"
+    __motor_db__ = "vtbili"
+
+
+class HoloLBiliDB(BaseModel):
+    __coll__ = "live_data"
+    __dbkey__ = "vtbili"
+
+
+class NijiLBiliDB(BaseModel):
+    __coll__ = "live_niji_data"
+    __dbkey__ = "vtbili"
 
 
 class OtherYTDB(BaseModel):
     __coll__ = "yt_other_livedata"
-    __motor_db__ = "holobili"
+    __motor_db__ = "vtbili"
 
 
 class ChannelsBiliDB(BaseModel):
     __coll__ = "channel_data"
-    __motor_db__ = "holobili"
+    __motor_db__ = "vtbili"
 
 
 class BiliScheduleModel:
