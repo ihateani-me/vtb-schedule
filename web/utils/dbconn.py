@@ -6,7 +6,9 @@ from .dataset import OTHER_YT_DATASET
 from .models import (
     ChannelsBiliDB,
     HoloBiliDB,
+    HoloLBiliDB,
     NijiBiliDB,
+    NijiLBiliDB,
     OtherBiliDB,
     OtherYTDB,
     VTubersDB,
@@ -136,6 +138,48 @@ async def fetch_vtdb_data():
         "vtuber": data["vtuber"],
         "cached": True,
     }
+
+
+@cached(
+    key="liveholo",
+    ttl=60,
+    serializer=JsonSerializer(),
+)
+async def fetch_hlive_data():
+    try:
+        logger.debug("Fetching HoloLIVE database...")
+        data = await HoloLBiliDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"live": [], "cached": False}
+    logger.info("Returning...")
+    live_data = []
+    for live in data["live"]:
+        live["webtype"] = "bilibili"
+        live_data.append(live)
+    return {"live": live_data, "cached": True}
+
+
+@cached(
+    key="liveniji",
+    ttl=60,
+    serializer=JsonSerializer(),
+)
+async def fetch_nilive_data():
+    try:
+        logger.debug("Fetching NijiLIVE database...")
+        data = await NijiLBiliDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"live": [], "cached": False}
+    logger.info("Returning...")
+    live_data = []
+    for live in data["live"]:
+        live["webtype"] = "bilibili"
+        live_data.append(live)
+    return {"live": live_data, "cached": True}
 
 
 cache = Cache(serializer=JsonSerializer())
