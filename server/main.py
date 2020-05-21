@@ -7,7 +7,7 @@ import sys
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import ujson
-from jobs import (
+from .jobs import (
     holo_heartbeat,
     hololive_main,
     niji_heartbeat,
@@ -17,7 +17,7 @@ from jobs import (
     youtube_live_heartbeat,
     youtube_video_feeds,
 )
-from jobs.utils import Jetri, VTBiliDatabase
+from .jobs.utils import Jetri, VTBiliDatabase
 
 BASE_FOLDER_PATH = "./"  # Modify this
 MONGODB_URI = "mongodb://127.0.0.1:12345"  # Modify this
