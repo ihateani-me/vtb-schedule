@@ -1,0 +1,561 @@
+{
+    "holo": {
+        "21267062": {
+            "id": "UC0TXe_LYZ4scaW2XMyi5_kw",
+            "bili_uid": "389056211",
+            "room_id": "21267062",
+            "name": "AZKi_Official"
+        },
+        "8899503": {
+            "id": "UCp6993wxpyDPHUpavwDFqgg",
+            "bili_uid": "286179206",
+            "room_id": "8899503",
+            "name": "时乃空Official"
+        },
+        "4664126": {
+            "id": "UCDqI2jOz0weumE8s7paEk6g",
+            "bili_uid": "20813493",
+            "room_id": "4664126",
+            "name": "萝卜子Official"
+        },
+        "21144047": {
+            "id": "UC-hM6YJuNYVAmUWxeIr9FeA",
+            "bili_uid": "366690056",
+            "room_id": "21144047",
+            "name": "樱巫女Official"
+        },
+        "190577": {
+            "id": "UC5CwaMl1eIgY8h02uZw7u8A",
+            "bili_uid": "9034870",
+            "room_id": "190577",
+            "name": "星街彗星Official"
+        },
+        "21131813": {
+            "id": "UCD8HOxPs4Xvsm8H0ZxXGiBw",
+            "bili_uid": "389856447",
+            "room_id": "21131813",
+            "name": "夜空梅露Official"
+        },
+        "13946381": {
+            "id": "UCQ0UDLQCjY0rmuxCDE38FGg",
+            "bili_uid": "336731767",
+            "room_id": "13946381",
+            "name": "夏色祭Official"
+        },
+        "14275133": {
+            "id": "UC1CfXB_kRs3C-zaeTG3oGyg",
+            "bili_uid": "339567211",
+            "room_id": "14275133",
+            "name": "赤井心Official"
+        },
+        "21219990": {
+            "id": "UCFTLzh12_nrtzqBPsTCqenA",
+            "bili_uid": "389857131",
+            "room_id": "21219990",
+            "name": "亚绮-罗森Official"
+        },
+        "14917277": {
+            "id": "UC1opHUrw8rvnsadT-iGp7Cg",
+            "bili_uid": "375504219",
+            "room_id": "14917277",
+            "name": "湊-阿库娅Official"
+        },
+        "21130785": {
+            "id": "UC7fk0CB07ly8oSl0aqKkqFg",
+            "bili_uid": "389858027",
+            "room_id": "21130785",
+            "name": "百鬼绫目Official"
+        },
+        "21107534": {
+            "id": "UC1suqwovbL1kzsoaZgFZLKg",
+            "bili_uid": "389858754",
+            "room_id": "21107534",
+            "name": "癒月巧可Official"
+        },
+        "21132965": {
+            "id": "UCXTpFs_3PqI41qX2d9tL2Rw",
+            "bili_uid": "389857640",
+            "room_id": "21132965",
+            "name": "紫咲诗音Official"
+        },
+        "21129632": {
+            "id": "UCvzGlP9oQwU--Y0r9id_jnA",
+            "bili_uid": "389859190",
+            "room_id": "21129632",
+            "name": "大空昴Official"
+        },
+        "11588230": {
+            "id": "UCdn5BQ06XqgXoAxIhbqw5Rg",
+            "bili_uid": "332704117",
+            "room_id": "11588230",
+            "name": "白上吹雪Official"
+        },
+        "21133979": {
+            "id": "UCp-5t9SrOQwXMU7iIjQfARg",
+            "bili_uid": "389862071",
+            "room_id": "21133979",
+            "name": "大神澪Official"
+        },
+        "21420932": {
+            "id": "UCvaTdHTWBGv3MKj3KVqJVCw",
+            "bili_uid": "412135222",
+            "room_id": "21420932",
+            "name": "猫又小粥Official"
+        },
+        "21421141": {
+            "id": "UChAnqc_AY5_I3Px5dig3X1Q",
+            "bili_uid": "412135619",
+            "room_id": "21421141",
+            "name": "戌神沁音Official"
+        },
+        "21572617": {
+            "id": "UCvInZx9h3jC2JzsIzoOebWg",
+            "bili_uid": "454737600",
+            "room_id": "21572617",
+            "name": "不知火芙蕾雅Official"
+        },
+        "21583736": {
+            "id": "UCdyqAaZDKHXg4Ahi7VENThQ",
+            "bili_uid": "454733056",
+            "room_id": "21583736",
+            "name": "白银诺艾尔Official"
+        },
+        "21584153": {
+            "id": "UCCzUftO8KOVkV4wQG1vkUvg",
+            "bili_uid": "454955503",
+            "room_id": "21584153",
+            "name": "宝钟玛琳Official"
+        },
+        "21560356": {
+            "id": "UC1DCedRgGHBdm81E1llLhOQ",
+            "bili_uid": "443305053",
+            "room_id": "21560356",
+            "name": "兔田佩克拉Official"
+        },
+        "21545232": {
+            "id": "UCl_gCybOJRIgOXw6Qb4qJzQ",
+            "bili_uid": "443300418",
+            "room_id": "21545232",
+            "name": "润羽露西娅Official"
+        },
+        "21752681": {
+            "id": "UCZlDXzGoo7d44bwdNObFacg",
+            "bili_uid": "491474048",
+            "room_id": "21752681",
+            "name": "天音彼方Official"
+        },
+        "21752686": {
+            "id": "UCS9uQI-jC3DE0L4IpXyvr6w",
+            "bili_uid": "491474049",
+            "room_id": "21752686",
+            "name": "桐生可可Official"
+        },
+        "21752694": {
+            "id": "UCqm3BQLlJfvkTsX_hvm0UmA",
+            "bili_uid": "491474050",
+            "room_id": "21752694",
+            "name": "角卷绵芽Official"
+        },
+        "21752710": {
+            "id": "UC1uv2Oq6kNxgATlCiez59hw",
+            "bili_uid": "491474051",
+            "room_id": "21752710",
+            "name": "常暗永远Official"
+        },
+        "21752719": {
+            "id": "UCa9Y57gfeY0Zro_noHRVrnw",
+            "bili_uid": "491474052",
+            "room_id": "21752719",
+            "name": "姬森璐娜Official"
+        },
+        "21618129": {
+            "bili_uid": "427061218",
+            "room_id": "21618129",
+            "name": "夜霧Yogiri"
+        },
+        "21618138": {
+            "bili_uid": "354411419",
+            "room_id": "21618138",
+            "name": "希薇娅Civia"
+        },
+        "21641569": {
+            "bili_uid": "456368455",
+            "room_id": "21641569",
+            "name": "黑桃影"
+        },
+        "21908209": {
+            "bili_uid": "511613156",
+            "room_id": "21908209",
+            "name": "朵莉丝Doris"
+        },
+        "21908196": {
+            "bili_uid": "511613155",
+            "room_id": "21908196",
+            "name": "阿媂娅Artia"
+        },
+        "21908222": {
+            "bili_uid": "511613157",
+            "room_id": "21908222",
+            "name": "罗莎琳Rosalyn"
+        },
+        "21749477": {
+            "id": "UCZgOv3YDEs-ZnZWDYVwJdmA",
+            "bili_uid": "456232604",
+            "room_id": "21749477",
+            "name": "奏手一弦Official"
+        },
+        "22171183": {
+            "id": "UCKeAhJvy8zgXWbh9duVjIaQ",
+            "bili_uid": "551114700",
+            "room_id": "22171183",
+            "name": "阿尔兰蒂斯Official"
+        },
+        "13009645": {
+            "id": "UC9mf_ZVpouoILRY9NUIaK-w",
+            "bili_uid": "350631685",
+            "room_id": "13009645",
+            "name": "律可Official"
+        },
+        "22171189": {
+            "id": "UCNVEsYbiZjH5QLmGeSgTSzg",
+            "bili_uid": "551114698",
+            "room_id": "22171189",
+            "name": "阿斯特尔瑞达Official"
+        }
+    },
+    "niji": {
+        "21449083": {
+            "id": "UCt0clH12Xk1-Ej5PXKGfdPA",
+            "bili_uid": "434565011",
+            "room_id": "21449083",
+            "name": "物述有栖Official"
+        },
+        "21449068": {
+            "id": "UCspv01oxUFf_MTSipURRhkA",
+            "bili_uid": "434563934",
+            "room_id": "21449068",
+            "name": "叶Official"
+        },
+        "21449065": {
+            "id": "UCSFCh5NL4qXrAy9u-u2lX3g",
+            "bili_uid": "434563422",
+            "room_id": "21449065",
+            "name": "葛叶Official"
+        },
+        "21463227": {
+            "id": "UC_GCs6GARLxEHxy1w40d6VQ",
+            "bili_uid": "436596837",
+            "room_id": "21463227",
+            "name": "家长麦Official"
+        },
+        "21463219": {
+            "id": "UCoztvTULBYd3WmStqYeoHcA",
+            "bili_uid": "436596839",
+            "room_id": "21463219",
+            "name": "笹木咲Official"
+        },
+        "21302352": {
+            "id": "UC6oDys1BGgBsIC3WhG1BovQ",
+            "bili_uid": "403921378",
+            "room_id": "21302352",
+            "name": "静凛Official"
+        },
+        "21656036": {
+            "id": "UC1zFJrfEKvCixhsjNSb1toQ",
+            "bili_uid": "477780496",
+            "room_id": "21656036",
+            "name": "修女克蕾雅Official"
+        },
+        "21501731": {
+            "id": "UCjlmCrq4TP1I4xguOtJ-31w",
+            "bili_uid": "441666968",
+            "room_id": "21501731",
+            "name": "德比鲁Official"
+        },
+        "21501730": {
+            "id": "UCbc8fwhdUNlqi-J99ISYu4A",
+            "bili_uid": "441666967",
+            "room_id": "21501730",
+            "name": "贝尔蒙德Official"
+        },
+        "21908182": {
+            "id": "UCTIE7LM5X15NVugV7Krp9Hw",
+            "bili_uid": "511613154",
+            "room_id": "21908182",
+            "name": "梦追翔Official"
+        },
+        "21302477": {
+            "id": "UC0g1AE0DOjBYnLhkgoRWN1w",
+            "bili_uid": "403928672",
+            "room_id": "21302477",
+            "name": "本间向日葵Official"
+        },
+        "21463224": {
+            "id": "UCtpB6Bvhs1Um93ziEDACQ8g",
+            "bili_uid": "436596836",
+            "room_id": "21463224",
+            "name": "森中花咲Official"
+        },
+        "21302469": {
+            "id": "UC_4tXjqecqox5Uc05ncxpxg",
+            "bili_uid": "403927583",
+            "room_id": "21302469",
+            "name": "椎名唯华Official"
+        },
+        "21449061": {
+            "id": "UCsg-YqdqQ-KFF0LNk23BY4A",
+            "bili_uid": "410455162",
+            "room_id": "21449061",
+            "name": "樋口枫Official"
+        },
+        "21575222": {
+            "id": "UCKMYISTJAQ8xTplUPHiABlA",
+            "bili_uid": "458154141",
+            "room_id": "21575222",
+            "name": "社筑Official"
+        },
+        "21450685": {
+            "id": "UCPvGypSgfDkVe7JG2KygK7A",
+            "bili_uid": "434564604",
+            "room_id": "21450685",
+            "name": "龙胆尊Official"
+        },
+        "21302479": {
+            "id": "UCt5-0i4AVHXaWJrL8Wql3mw",
+            "bili_uid": "403930401",
+            "room_id": "21302479",
+            "name": "绿仙Official"
+        },
+        "21656037": {
+            "id": "UCJubINhCcFXlsBwnHp0wl_g",
+            "bili_uid": "477780497",
+            "room_id": "21656037",
+            "name": "舞元启介Official"
+        },
+        "21575231": {
+            "id": "UCwokZsOK_uEre70XayaFnzA",
+            "bili_uid": "458154144",
+            "room_id": "21575231",
+            "name": "铃鹿诗子Official"
+        },
+        "21463247": {
+            "id": "UCV5ZZlLjk5MKGg3L0n0vbzw",
+            "bili_uid": "436596840",
+            "room_id": "21463247",
+            "name": "鹰宫莉音Official"
+        },
+        "21575216": {
+            "id": "UCveZ9Ic1VtcXbsyaBgxPMvg",
+            "bili_uid": "458154140",
+            "room_id": "21575216",
+            "name": "童田明治Official"
+        },
+        "21575212": {
+            "id": "UCeShTCVgZyq2lsBW9QwIJcw",
+            "bili_uid": "458154139",
+            "room_id": "21575212",
+            "name": "郡道美玲Official"
+        },
+        "21656050": {
+            "id": "UCCVwhI5trmaSxfcze_Ovzfw",
+            "bili_uid": "477780499",
+            "room_id": "21656050",
+            "name": "梦月萝娅_Official"
+        },
+        "21463238": {
+            "id": "UCwQ9Uv-m8xkE5PzRc7Bqx3Q",
+            "bili_uid": "436596838",
+            "room_id": "21463238",
+            "name": "御伽原江良Official"
+        },
+        "21575228": {
+            "id": "UCHVXbQzkl3rDfsXWo8xi2qw",
+            "bili_uid": "458154143",
+            "room_id": "21575228",
+            "name": "安洁Official"
+        },
+        "21575226": {
+            "id": "UCXRlIK3Cw_TJIQC5kSJJQMg",
+            "bili_uid": "458154142",
+            "room_id": "21575226",
+            "name": "戌亥床Official"
+        },
+        "21463249": {
+            "id": "UCZ1xuCK1kNmn5RzPYIZop3w",
+            "bili_uid": "436596841",
+            "room_id": "21463249",
+            "name": "莉泽Official"
+        },
+        "21656043": {
+            "id": "UCIytNcoz4pWzXfLda0DoULQ",
+            "bili_uid": "477780498",
+            "room_id": "21656043",
+            "name": "艾克斯Official"
+        },
+        "0": {
+            "bili_uid": "474113504",
+            "room_id": "0",
+            "name": "樱樱火Official"
+        },
+        "21403601": {
+            "bili_uid": "421267475",
+            "room_id": "21403601",
+            "name": "艾因Eine"
+        },
+        "21403609": {
+            "bili_uid": "420249427",
+            "room_id": "21403609",
+            "name": "琉绮Ruki"
+        },
+        "21452505": {
+            "bili_uid": "434334701",
+            "room_id": "21452505",
+            "name": "七海Nana7mi"
+        },
+        "21452118": {
+            "bili_uid": "434341786",
+            "room_id": "21452118",
+            "name": "一果Ichigo"
+        },
+        "21457197": {
+            "bili_uid": "434401868",
+            "room_id": "21457197",
+            "name": "中单光一"
+        },
+        "21571739": {
+            "bili_uid": "455916618",
+            "room_id": "21571739",
+            "name": "无理MURI"
+        },
+        "21669084": {
+            "bili_uid": "455965041",
+            "room_id": "21669084",
+            "name": "羽音Hanon"
+        },
+        "21613353": {
+            "bili_uid": "472845978",
+            "room_id": "21613353",
+            "name": "有加plus"
+        },
+        "21615277": {
+            "bili_uid": "472821519",
+            "room_id": "21615277",
+            "name": "喵月nyatsuki"
+        },
+        "21613356": {
+            "bili_uid": "472877684",
+            "room_id": "21613356",
+            "name": "惑姬Waku"
+        },
+        "21672023": {
+            "bili_uid": "477317922",
+            "room_id": "21672023",
+            "name": "弥希Miki"
+        },
+        "21672022": {
+            "bili_uid": "477342747",
+            "room_id": "21672022",
+            "name": "星弥Hoshimi"
+        },
+        "21672024": {
+            "bili_uid": "477306079",
+            "room_id": "21672024",
+            "name": "真绯瑠mahiru"
+        },
+        "21696929": {
+            "bili_uid": "480675481",
+            "room_id": "21696929",
+            "name": "八木迪之"
+        },
+        "21696950": {
+            "bili_uid": "480680646",
+            "room_id": "21696950",
+            "name": "阿萨Aza"
+        },
+        "21696953": {
+            "bili_uid": "480745939",
+            "room_id": "21696953",
+            "name": "罗伊_Roi"
+        },
+        "21696957": {
+            "bili_uid": "474369808",
+            "room_id": "21696957",
+            "name": "度人Tabibito"
+        },
+        "21763337": {
+            "bili_uid": "319810877",
+            "room_id": "21763337",
+            "name": "星也seiya"
+        },
+        "21763344": {
+            "bili_uid": "490331391",
+            "room_id": "21763344",
+            "name": "沙夜_Saya"
+        },
+        "21756924": {
+            "bili_uid": "56748733",
+            "room_id": "21756924",
+            "name": "雪绘Yukie"
+        },
+        "22111442": {
+            "bili_uid": "370688671",
+            "room_id": "22111442",
+            "name": "帕克丝Pax"
+        },
+        "22086027": {
+            "bili_uid": "370689338",
+            "room_id": "22086027",
+            "name": "御水Mimoi"
+        },
+        "22111414": {
+            "bili_uid": "370687372",
+            "room_id": "22111414",
+            "name": "紫纪Shiki"
+        },
+        "22111428": {
+            "bili_uid": "370687588",
+            "room_id": "22111428",
+            "name": "花留Karu"
+        },
+        "22111450": {
+            "bili_uid": "370689210",
+            "room_id": "22111450",
+            "name": "萨麦尔_Samael"
+        },
+        "21224291": {
+            "bili_uid": "392505232",
+            "room_id": "21224291",
+            "name": "安堂いなり_official"
+        },
+        "21664698": {
+            "bili_uid": "471308347",
+            "room_id": "21664698",
+            "name": "寿寿歌_suzuka"
+        },
+        "1573301": {
+            "bili_uid": "36795838",
+            "room_id": "1573301",
+            "name": "KINGSK科科_Channel"
+        },
+        "4418655": {
+            "bili_uid": "98181",
+            "room_id": "4418655",
+            "name": "菫妃奈Official"
+        },
+        "8721033": {
+            "bili_uid": "1750561",
+            "room_id": "8721033",
+            "name": "蜜球兔"
+        },
+        "21736138": {
+            "bili_uid": "322210278",
+            "room_id": "21736138",
+            "name": "魔魔マラ"
+        },
+        "47377": {
+            "bili_uid": "282994",
+            "room_id": "47377",
+            "name": "泠鸢yousa"
+        }
+    }
+}

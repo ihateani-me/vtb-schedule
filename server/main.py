@@ -6,8 +6,11 @@ import sys
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+import ujson
 from jobs import (
+    holo_heartbeat,
     hololive_main,
+    niji_heartbeat,
     nijisanji_main,
     others_main,
     update_channels_stats,
@@ -22,7 +25,8 @@ MONGODB_DBNAME = "vtbili"  # Modify this
 YT_API_KEY = ""  # Modify this
 
 INTERVAL_BILI_CHANNELS = 6 * 60  # In minutes
-INTERVAL_BILI_LIVE = 4  # In minutes
+INTERVAL_BILI_UPCOMING = 4  # In minutes
+INTERVAL_BILI_LIVE = 2  # In minutes
 INTERVAL_YT_FEED = 2  # In minutes
 INTERVAL_YT_LIVE = 1  # In minutes
 
@@ -56,8 +60,9 @@ if __name__ == "__main__":
     scheduler = AsyncIOScheduler()
 
     vtlog.info(
-        f"With Interval:\n\t- BiliBili Live/Channels: "
-        f"{INTERVAL_BILI_LIVE}/{INTERVAL_BILI_CHANNELS} mins\n\t"
+        f"With Interval:\n\t- BiliBili Live/Upcoming/Channels: "
+        f"{INTERVAL_BILI_LIVE}/{INTERVAL_BILI_UPCOMING}"
+        f"/{INTERVAL_BILI_CHANNELS} mins\n\t"
         f"- YouTube Feed/Live: {INTERVAL_YT_FEED}/{INTERVAL_YT_LIVE} mins"
     )
 
@@ -66,13 +71,13 @@ if __name__ == "__main__":
         hololive_main,
         "interval",
         kwargs={"DatabaseConn": vtbili_db},
-        minutes=INTERVAL_BILI_LIVE,
+        minutes=INTERVAL_BILI_UPCOMING,
     )
     scheduler.add_job(
         nijisanji_main,
         "interval",
         kwargs={"DatabaseConn": vtbili_db},
-        minutes=INTERVAL_BILI_LIVE,
+        minutes=INTERVAL_BILI_UPCOMING,
     )
 
     others_dataset = os.path.join(
@@ -83,7 +88,7 @@ if __name__ == "__main__":
         others_main,
         "interval",
         kwargs={"DatabaseConn": vtbili_db, "dataset_path": others_dataset},
-        minutes=INTERVAL_BILI_LIVE,
+        minutes=INTERVAL_BILI_UPCOMING,
     )
 
     dataset_all = glob.glob(
@@ -105,7 +110,7 @@ if __name__ == "__main__":
         youtube_video_feeds,
         "interval",
         kwargs={
-            "DatasetConn": vtbili_db,
+            "DatabaseConn": vtbili_db,
             "dataset": others_yt_dataset,
             "yt_api_key": YT_API_KEY,
         },
@@ -119,6 +124,34 @@ if __name__ == "__main__":
         minutes=INTERVAL_YT_LIVE,
     )
 
+    ytbili_file = os.path.join(
+        BASE_FOLDER_PATH, "dataset", "_ytbili_mapping.json"
+    )
+    with open(ytbili_file, "r", encoding="utf-8") as fp:
+        ytbili_mapping = ujson.load(fp)
+
+    scheduler.add_job(
+        holo_heartbeat,
+        "interval",
+        kwargs={
+            "DatabaseConn": vtbili_db,
+            "JetriConn": jetri_co,
+            "room_dataset": ytbili_mapping,
+        },
+        minutes=INTERVAL_BILI_LIVE,
+    )
+
+    scheduler.add_job(
+        niji_heartbeat,
+        "interval",
+        kwargs={
+            "DatabaseConn": vtbili_db,
+            "JetriConn": jetri_co,
+            "room_dataset": ytbili_mapping,
+        },
+        minutes=INTERVAL_BILI_LIVE,
+    )
+
     vtlog.info("Doing first run!")
     jobs_data = [
         asyncio.ensure_future(hololive_main(vtbili_db)),
@@ -128,8 +161,14 @@ if __name__ == "__main__":
         asyncio.ensure_future(youtube_live_heartbeat(vtbili_db, YT_API_KEY)),
         asyncio.ensure_future(
             youtube_video_feeds(
-                MONGODB_URI, MONGODB_DBNAME, others_yt_dataset, YT_API_KEY
+                vtbili_db, others_yt_dataset, YT_API_KEY
             )
+        ),
+        asyncio.ensure_future(
+            holo_heartbeat(vtbili_db, jetri_co, ytbili_mapping)
+        ),
+        asyncio.ensure_future(
+            niji_heartbeat(vtbili_db, jetri_co, ytbili_mapping)
         ),
     ]
     loop_de_loop.run_until_complete(asyncio.gather(*jobs_data))

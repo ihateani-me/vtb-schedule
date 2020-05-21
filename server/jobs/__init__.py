@@ -1,5 +1,6 @@
 # flake8: noqa
 
+from .bili_heartbeat import holo_heartbeat, niji_heartbeat
 from .channels_bili import update_channels_stats
 from .hololive import hololive_main
 from .nijisanji import nijisanji_main
