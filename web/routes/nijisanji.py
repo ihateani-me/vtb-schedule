@@ -8,7 +8,6 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_nijibili,
-    fetch_nilive_data,
     parse_uuids_args,
 )
 from utils.models import BiliChannelsModel, BiliScheduleModel
@@ -32,6 +31,7 @@ nijibp = Blueprint("Nijisanji", "/nijisanji", strict_slashes=True)
 )
 @doc.produces(
     {
+        "live": doc.List(BiliScheduleModel),
         "upcoming": doc.List(BiliScheduleModel),
         "cached": doc.Boolean(
             "Is the results cached or not?", True, "cached", choices=[True]
@@ -42,12 +42,11 @@ nijibp = Blueprint("Nijisanji", "/nijisanji", strict_slashes=True)
 )
 async def nijiliveup_api(request):
     logger.info(f"Requested {request.path} data")
-    upcoming_results = await fetch_data("nijibili", fetch_nijibili)
-    upcoming_results = await parse_uuids_args(request.args, upcoming_results)
-    lives_results = await fetch_data("liveniji", fetch_nilive_data)
+    niji_results = await fetch_data("nijibili", fetch_nijibili)
+    upcoming_results = await parse_uuids_args(request.args, niji_results)
     return json(
         {
-            "live": lives_results["live"],
+            "live": niji_results["live"],
             "upcoming": upcoming_results["upcoming"],
             "cached": True,
         },

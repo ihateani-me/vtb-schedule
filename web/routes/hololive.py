@@ -8,7 +8,6 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_holobili,
-    fetch_hlive_data,
     parse_uuids_args,
 )
 from utils.models import BiliChannelsModel, BiliScheduleModel
@@ -16,7 +15,7 @@ from utils.models import BiliChannelsModel, BiliScheduleModel
 holobp = Blueprint("Hololive", "/", strict_slashes=True)
 
 
-@holobp.get("/upcoming")
+@holobp.get("/live")
 @doc.summary("Live/Upcoming HoloLive streams")
 @doc.description(
     "Fetch a list of live/upcoming streams from HoloLive VTubers"
@@ -43,12 +42,11 @@ holobp = Blueprint("Hololive", "/", strict_slashes=True)
 )
 async def hololiveup_api(request):
     logger.info(f"Requested {request.path} data")
-    upcoming_results = await fetch_data("holobili", fetch_holobili)
-    upcoming_results = await parse_uuids_args(request.args, upcoming_results)
-    lives_results = await fetch_data("liveholo", fetch_hlive_data)
+    holo_results = await fetch_data("holobili", fetch_holobili)
+    upcoming_results = await parse_uuids_args(request.args, holo_results)
     return json(
         {
-            "live": lives_results["live"],
+            "live": holo_results["live"],
             "upcoming": upcoming_results["upcoming"],
             "cached": True,
         },

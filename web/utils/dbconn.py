@@ -6,12 +6,9 @@ from .dataset import OTHER_YT_DATASET
 from .models import (
     ChannelsBiliDB,
     HoloBiliDB,
-    HoloLBiliDB,
     NijiBiliDB,
-    NijiLBiliDB,
     OtherBiliDB,
     OtherYTDB,
-    VTubersDB,
 )
 
 
@@ -25,13 +22,17 @@ async def fetch_holobili():
     except Exception as e:
         logger.debug(e)
         logger.debug("Failed to fetch database, returning...")
-        return {"upcoming": [], "cached": False}
+        return {"upcoming": [], "live": []}
     logger.info("Returning...")
     upcoming_data = []
+    live_data = []
     for upcome in data["upcoming"]:
         upcome["webtype"] = "bilibili"
         upcoming_data.append(upcome)
-    return {"upcoming": upcoming_data, "cached": True}
+    for livers in data["live"]:
+        livers["webtype"] = "bilibili"
+        live_data.append(livers)
+    return {"upcoming": upcoming_data, "live": live_data}
 
 
 @cached(
@@ -44,13 +45,17 @@ async def fetch_nijibili():
     except Exception as e:
         logger.debug(e)
         logger.debug("Failed to fetch database, returning...")
-        return {"upcoming": [], "cached": False}
+        return {"upcoming": [], "live": []}
     logger.info("Returning...")
     upcoming_data = []
+    live_data = []
     for upcome in data["upcoming"]:
         upcome["webtype"] = "bilibili"
         upcoming_data.append(upcome)
-    return {"upcoming": upcoming_data, "cached": True}
+    for livers in data["live"]:
+        livers["webtype"] = "bilibili"
+        live_data.append(livers)
+    return {"upcoming": upcoming_data, "live": live_data}
 
 
 @cached(
@@ -63,13 +68,13 @@ async def fetch_otherbili():
     except Exception as e:
         logger.debug(e)
         logger.debug("Failed to fetch database, returning...")
-        return {"upcoming": [], "cached": False}
+        return {"upcoming": []}
     logger.info("Returning...")
     upcoming_data = []
     for upcome in data["upcoming"]:
         upcome["webtype"] = "bilibili"
         upcoming_data.append(upcome)
-    return {"upcoming": upcoming_data, "cached": True}
+    return {"upcoming": upcoming_data}
 
 
 @cached(
@@ -119,67 +124,6 @@ async def fetch_otheryt_channels():
     # try:
     logger.debug("Fetching channels database...")
     return {"data": OTHER_YT_DATASET}
-
-
-@cached(
-    key="vtdb", ttl=3600, serializer=JsonSerializer(),
-)
-async def fetch_vtdb_data():
-    try:
-        logger.debug("Fetching VTDB database...")
-        data = await VTubersDB.find_one()
-    except Exception as e:
-        logger.debug(e)
-        logger.debug("Failed to fetch database, returning...")
-        return {"meta": {}, "vtuber": [], "cached": False}
-    logger.info("Returning...")
-    return {
-        "meta": data["meta"],
-        "vtuber": data["vtuber"],
-        "cached": True,
-    }
-
-
-@cached(
-    key="liveholo",
-    ttl=60,
-    serializer=JsonSerializer(),
-)
-async def fetch_hlive_data():
-    try:
-        logger.debug("Fetching HoloLIVE database...")
-        data = await HoloLBiliDB.find_one()
-    except Exception as e:
-        logger.debug(e)
-        logger.debug("Failed to fetch database, returning...")
-        return {"live": [], "cached": False}
-    logger.info("Returning...")
-    live_data = []
-    for live in data["live"]:
-        live["webtype"] = "bilibili"
-        live_data.append(live)
-    return {"live": live_data, "cached": True}
-
-
-@cached(
-    key="liveniji",
-    ttl=60,
-    serializer=JsonSerializer(),
-)
-async def fetch_nilive_data():
-    try:
-        logger.debug("Fetching NijiLIVE database...")
-        data = await NijiLBiliDB.find_one()
-    except Exception as e:
-        logger.debug(e)
-        logger.debug("Failed to fetch database, returning...")
-        return {"live": [], "cached": False}
-    logger.info("Returning...")
-    live_data = []
-    for live in data["live"]:
-        live["webtype"] = "bilibili"
-        live_data.append(live)
-    return {"live": live_data, "cached": True}
 
 
 cache = Cache(serializer=JsonSerializer())
@@ -233,20 +177,6 @@ async def fetch_yt_channels():
         logger.debug("Failed fetching cache, fetching to remote db...")
         vlivers_chan = await fetch_otheryt_channels()
     return vlivers_chan
-
-
-async def fetch_vtdb():
-    logger.debug("Trying to fetch vtdb data...")
-    try:
-        data = await cache.get("vtdb")
-        if not data:
-            logger.debug("No cache found, fetching to remote DB.")
-            data = await fetch_vtdb_data()
-        logger.debug("Cache found, using cache...")
-    except Exception:
-        logger.debug("Failed fetching cache...")
-        data = await fetch_vtdb_data()
-    return data
 
 
 async def parse_uuids_args(args, fetched_results):
