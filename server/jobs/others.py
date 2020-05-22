@@ -77,5 +77,5 @@ async def others_main(DatabaseConn: VTBiliDatabase, dataset_path: str):
     calendar_data = await fetch_bili_calendar(CHAN_BILI_UIDS)
 
     vtlog.info("Updating database...")
-    upd_data = {"upcoming": calendar_data, "cached": True}
-    await DatabaseConn.update_data("upcoming_other_data", upd_data)
+    upd_data = {"upcoming": calendar_data}
+    await DatabaseConn.update_data("live_other_data", upd_data)

@@ -136,5 +136,5 @@ async def nijisanji_main(DatabaseConn: VTBiliDatabase):
     calendar_data = await fetch_bili_calendar()
 
     vtlog.info("Updating database...")
-    upd_data = {"upcoming": calendar_data, "cached": True}
-    await DatabaseConn.update_data("upcoming_niji_data", upd_data)
+    upd_data = {"upcoming": calendar_data}
+    await DatabaseConn.update_data("live_niji_data", upd_data)

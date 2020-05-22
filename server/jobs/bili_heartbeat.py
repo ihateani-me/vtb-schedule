@@ -90,7 +90,7 @@ async def holo_heartbeat(
         finalized_data.sort(key=lambda x: x["startTime"])
 
     vtlog.info("Updating database...")
-    upd_data = {"live": finalized_data, "cached": True}
+    upd_data = {"live": finalized_data}
     await DatabaseConn.update_data("live_data", upd_data)
     await session.close()
 
@@ -162,6 +162,6 @@ async def niji_heartbeat(
         finalized_data.sort(key=lambda x: x["startTime"])
 
     vtlog.info("Updating database...")
-    upd_data = {"live": finalized_data, "cached": True}
+    upd_data = {"live": finalized_data}
     await DatabaseConn.update_data("live_niji_data", upd_data)
     await session.close()
