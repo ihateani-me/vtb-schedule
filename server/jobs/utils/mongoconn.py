@@ -34,6 +34,16 @@ class VTBiliDatabase:
         self._locked = False
         self.logger.debug("\tLock released.")
 
+    async def insert_new(self, coll_key: str, data: dict) -> bool:
+        coll: AsyncIOMotorCollection = self._vtdb[coll_key]
+        self.logger.info(f"\tCreating new data for: {coll_key}")
+        result = await coll.insert_one(data)
+        if result.acknowledged:
+            self.logger.info(f"\tInserted with IDs: {result.inserted_id}")
+            return True
+        self.logger.error("\tFailed to insert new data.")
+        return False
+
     async def update_data(self, coll_key: str, data: dict) -> bool:
         upd = {"$set": data}
         coll: AsyncIOMotorCollection = self._vtdb[coll_key]
@@ -45,6 +55,7 @@ class VTBiliDatabase:
             self.logger.info("\tUpdated!")
             return True
         self.logger.error("\tFailed to update database...")
+        return False
 
     async def fetch_data(self, key: str) -> dict:
         coll: AsyncIOMotorCollection = self._vtdb[key]
