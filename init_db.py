@@ -16,43 +16,26 @@ async def initialize_vtbili():
     dbconn = dbclient[MONGODB_DBNAME]
     print("+- Connection established!")
 
-    print("|= Initializing Upcoming Data")
+    print("|= Initializing Main Data")
     print("|--> HoloLive")
-    holo_coll = dbconn["upcoming_data"]
-    result = await holo_coll.insert_one({"upcoming": [], "cached": False})
+    holo_coll = dbconn["live_data"]
+    result = await holo_coll.insert_one({"live": [], "upcoming": []})
     if not result.acknowledged:
         print("|-- ** Failed to insert, please retry again later **")
         return 1
     print("|-- $ Success")
 
     print("|--> Nijisanji")
-    niji_coll = dbconn["upcoming_niji_data"]
-    result = await niji_coll.insert_one({"upcoming": [], "cached": False})
+    niji_coll = dbconn["live_niji_data"]
+    result = await niji_coll.insert_one({"live": [], "upcoming": []})
     if not result.acknowledged:
         print("|-- ** Failed to insert, please retry again later **")
         return 1
     print("|-- $ Success")
 
     print("|--> Other VTubers")
-    other_coll = dbconn["upcoming_other_data"]
-    result = await other_coll.insert_one({"upcoming": [], "cached": False})
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
-    print("|-- $ Success")
-
-    print("|= Initializing Live Data")
-    print("|--> HoloLive")
-    holo_live = dbconn["live_data"]
-    result = await holo_live.insert_one({"live": [], "cached": False})
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
-    print("|-- $ Success")
-
-    print("|--> Nijisanji")
-    niji_live = dbconn["live_niji_data"]
-    result = await niji_live.insert_one({"live": [], "cached": False})
+    other_coll = dbconn["live_other_data"]
+    result = await other_coll.insert_one({"upcoming": []})
     if not result.acknowledged:
         print("|-- ** Failed to insert, please retry again later **")
         return 1
