@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 import aiohttp
 import feedparser
@@ -114,8 +114,6 @@ async def youtube_video_feeds(
                 continue
             if broadcast_cnt not in ("live", "upcoming"):
                 continue
-            if "actualStartTime" in livedetails:
-                continue
 
             title = snippets["title"]
             channel = snippets["channelId"]
@@ -127,7 +125,7 @@ async def youtube_video_feeds(
                 dts = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
             except ValueError:
                 dts = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
-            start_time_ts = int(round(dts.timestamp()))
+            start_time_ts = int(round(dts.replace(tzinfo=timezone.utc).timestamp()))
 
             dd_hell = {
                 "id": video_id,
@@ -198,7 +196,7 @@ async def youtube_live_heartbeat(
                 strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%S.%fZ")
             except ValueError:
                 strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
-            override_start_time = int(round(strt.timestamp()))
+            override_start_time = int(round(strt.replace(tzinfo=timezone.utc).timestamp()))
         if "actualEndTime" in livedetails:
             status_live = "delete"
         vtlog.info(f"|--> Update status for {video_id}: {status_live}")
