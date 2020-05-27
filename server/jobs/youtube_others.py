@@ -125,7 +125,9 @@ async def youtube_video_feeds(
                 dts = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
             except ValueError:
                 dts = datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
-            start_time_ts = int(round(dts.replace(tzinfo=timezone.utc).timestamp()))
+            start_time_ts = int(
+                round(dts.replace(tzinfo=timezone.utc).timestamp())
+            )
 
             dd_hell = {
                 "id": video_id,
@@ -188,30 +190,27 @@ async def youtube_live_heartbeat(
         livedetails = res_item["liveStreamingDetails"]
         new_streams_data = []
         status_live = "upcoming"
-        override_start_time = None
+        strt = livedetails["scheduledStartTime"]
         if "actualStartTime" in livedetails:
             status_live = "live"
             strt = livedetails["actualStartTime"]
-            try:
-                strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%S.%fZ")
-            except ValueError:
-                strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
-            override_start_time = int(round(strt.replace(tzinfo=timezone.utc).timestamp()))
         if "actualEndTime" in livedetails:
             status_live = "delete"
+        try:
+            strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
+        start_t = int(
+            round(strt.replace(tzinfo=timezone.utc).timestamp())
+        )
         vtlog.info(f"|--> Update status for {video_id}: {status_live}")
         for data_streams in youtube_lives_data[channel_id]:
             if data_streams["id"] == video_id:
                 if status_live != "delete":
-                    start_t = (
-                        override_start_time
-                        if override_start_time
-                        else data_streams["startTime"]
-                    )
                     new_streams_data.append(
                         {
                             "id": data_streams["id"],
-                            "title": data_streams["title"],
+                            "title": snippets["title"],
                             "status": status_live,
                             "startTime": start_t,
                         }
