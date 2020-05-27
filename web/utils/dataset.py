@@ -106,7 +106,7 @@ OTHER_YT_DATASET = [
     },
     {
         "id": "UCl-3q6t6zdZwgIsFZELb7Zg",
-        "name": "Shirayuri Lily",        
+        "name": "Shirayuri Lily",
         "affiliates": "vivid"
     }
 ]
