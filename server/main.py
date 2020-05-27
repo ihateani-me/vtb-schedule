@@ -160,9 +160,7 @@ if __name__ == "__main__":
         asyncio.ensure_future(update_channels_stats(vtbili_db, dataset_all)),
         asyncio.ensure_future(youtube_live_heartbeat(vtbili_db, YT_API_KEY)),
         asyncio.ensure_future(
-            youtube_video_feeds(
-                vtbili_db, others_yt_dataset, YT_API_KEY
-            )
+            youtube_video_feeds(vtbili_db, others_yt_dataset, YT_API_KEY)
         ),
         asyncio.ensure_future(
             holo_heartbeat(vtbili_db, jetri_co, ytbili_mapping)

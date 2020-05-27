@@ -45,9 +45,13 @@ async def holo_heartbeat(
             continue
         if room_data["live_status"] != 1:
             continue
-        start_time = int(round(datetime.strptime(
-            room_data["live_time"] + " +0800", "%Y-%m-%d %H:%M:%S %z"
-        ).timestamp()))
+        start_time = int(
+            round(
+                datetime.strptime(
+                    room_data["live_time"] + " +0800", "%Y-%m-%d %H:%M:%S %z"
+                ).timestamp()
+            )
+        )
         gen_id = f"bili{room_id}_{start_time}"
         dd = {
             "id": gen_id,
@@ -64,7 +68,9 @@ async def holo_heartbeat(
         current_lives = await DatabaseConn.fetch_data("live_data")
         if current_lives["live"]:
             vtlog.warn("There's live happening right now, flushing...")
-            await DatabaseConn.update_data("live_data", {"live": [], "cached": True})
+            await DatabaseConn.update_data(
+                "live_data", {"live": [], "cached": True}
+            )
         vtlog.warn("Bailing!")
         await session.close()
         return 1
@@ -117,9 +123,13 @@ async def niji_heartbeat(
             continue
         if room_data["live_status"] != 1:
             continue
-        start_time = int(round(datetime.strptime(
-            room_data["live_time"] + " +0800", "%Y-%m-%d %H:%M:%S %z"
-        ).timestamp()))
+        start_time = int(
+            round(
+                datetime.strptime(
+                    room_data["live_time"] + " +0800", "%Y-%m-%d %H:%M:%S %z"
+                ).timestamp()
+            )
+        )
         gen_id = f"bili{room_id}_{start_time}"
         dd = {
             "id": gen_id,
@@ -136,7 +146,9 @@ async def niji_heartbeat(
         current_lives = await DatabaseConn.fetch_data("live_niji_data")
         if current_lives["live"]:
             vtlog.warn("There's live happening right now, flushing...")
-            await DatabaseConn.update_data("live_niji_data", {"live": [], "cached": True})
+            await DatabaseConn.update_data(
+                "live_niji_data", {"live": [], "cached": True}
+            )
         vtlog.warn("Bailing!")
         await session.close()
         return 1
