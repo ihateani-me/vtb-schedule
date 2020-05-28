@@ -108,5 +108,60 @@ OTHER_YT_DATASET = [
         "id": "UCl-3q6t6zdZwgIsFZELb7Zg",
         "name": "Shirayuri Lily",
         "affiliates": "vivid"
+    },
+    {
+        "name": "Nanahira",
+        "id": "UC_fYA9QRK-aJnFTgvR_4zug",
+        "affiliates": "solovtuber"
+    },
+    {
+        "name": "Evelyn",
+        "id": "UCMxxFFeuhFQ30quuePTym0A",
+        "affiliates": "solovtuber"
+    },
+    {
+        "name": "Mia Canasyna",
+        "id": "UC7PYQOLdlvo9VgJjhrYeGaQ",
+        "affiliates": "solovtuber"
+    },
+    {
+        "name": "Andi Adinata",
+        "id": "UC9QnAjC7mT4ggHuedr1_kqQ",
+        "affiliates": "mahapanca"
+    },
+    {
+        "name": "Alia Adelia",
+        "id": "UCK4t1P3Aqqe6NDyRS92Opcg",
+        "affiliates": "mahapanca"
+    },
+    {
+        "name": "NANARIKA",
+        "id": "UCwICNPiOKwToYw_SEoFOnPw",
+        "affiliates": "mahapanca"
+    },
+    {
+        "name": "Ichinose Uruha",
+        "id": "UC5LyYg6cCA4yHEYvtUsir3g",
+        "affiliates": "lupinusvg"
+    },
+    {
+        "name": "Sumire Kaga",
+        "id": "UCyLGcqYs7RsBb3L0SJfzGYA",
+        "affiliates": "lupinusvg"
+    },
+    {
+        "name": "Nazuna Kaga",
+        "id": "UCiMG6VdScBabPhJ1ZtaVmbw",
+        "affiliates": "lupinusvg"
+    },
+    {
+        "name": "Kogara Toto",
+        "id": "UCgTzsBI0DIRopMylJEDqnog",
+        "affiliates": "lupinusvg"
+    },
+    {
+        "name": "Kurumi Noah",
+        "id": "UCIcAj6WkJ8vZ7DeJVgmeqKw",
+        "affiliates": "lupinusvg"
     }
 ]
