@@ -1,0 +1,57 @@
+[
+    {
+        "id": "robocosan",
+        "name": "Roboco-san",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "natsuiromatsuri",
+        "name": "Natsuiro Matsuri",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "akaihaato",
+        "name": "Akai Haato",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "akirosenthal",
+        "name": "Aki Rosenthal",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "nakiriayame",
+        "name": "Nakiri Ayame",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "yuzukichococh",
+        "name": "Yuzuki Choco",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "shirakamifubuki",
+        "name": "Shirakami Fubuki",
+        "affiliates": "hololive"
+    },
+    {
+        "id": "udukikohh",
+        "name": "Kou Uzuki",
+        "affiliates": "nijisanji"
+    },
+    {
+        "id": "g9v9g_mirei",
+        "name": "Mirei Gundo",
+        "affiliates": "nijisanji"
+    },
+    {
+        "id": "norioo_",
+        "name": "Inuyama Tamaki",
+        "affiliates": "noripro"
+    },
+    {
+        "id": "KaguraMea_VoV",
+        "name": "Kagura Mea",
+        "affiliates": "paryiproject"
+    }
+]
