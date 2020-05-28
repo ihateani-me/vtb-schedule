@@ -26,8 +26,8 @@ async def check_status(
 async def get_user_data(
     session: aiohttp.ClientSession, channel: str
 ) -> Tuple[Union[dict, None], str]:
-    uri = "https://frontendapi.twitcasting.tv/users/{}".format(channel)
-    async with session.get(uri, params={"detail": True}) as resp:
+    uri = f"https://frontendapi.twitcasting.tv/users/{channel}?detail=true"
+    async with session.get(uri) as resp:
         json_res: dict = await resp.json()
         if resp.status != 200:
             return None, channel
