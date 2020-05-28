@@ -9,6 +9,8 @@ from .models import (
     NijiBiliDB,
     OtherBiliDB,
     OtherYTDB,
+    TwitcastingDB,
+    TwitchDB,
 )
 
 
@@ -98,6 +100,44 @@ async def fetch_otheryt():
 
 
 @cached(
+    key="twitchdata", ttl=60, serializer=JsonSerializer(),
+)
+async def fetch_twitch():
+    try:
+        logger.debug("Fetching Twitch database...")
+        data = await TwitchDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"live": []}
+    logger.info("Returning...")
+    live_data = []
+    for upcome in data["live"]:
+        upcome["webtype"] = "twitch"
+        live_data.append(upcome)
+    return {"live": live_data}
+
+
+@cached(
+    key="twitcastdata", ttl=60, serializer=JsonSerializer(),
+)
+async def fetch_twitcasting():
+    try:
+        logger.debug("Fetching Twitcasting database...")
+        data = await TwitcastingDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"live": []}
+    logger.info("Returning...")
+    live_data = []
+    for upcome in data["live"]:
+        upcome["webtype"] = "twitcasting"
+        live_data.append(upcome)
+    return {"live": live_data}
+
+
+@cached(
     key="channels", ttl=7200, serializer=JsonSerializer(),
 )
 async def fetch_channels_data():
@@ -113,6 +153,8 @@ async def fetch_channels_data():
         "hololive": data["hololive"],
         "nijisanji": data["nijisanji"],
         "other": data["other"],
+        "twitcasting": data["twitcasting"],
+        "twitch": data["twitch"],
         "cached": True,
     }
 

@@ -4,30 +4,42 @@ import pytz
 from sanic_motor import BaseModel
 from sanic_openapi import doc
 
+MOTOR_DB = "vtbili"
+
 
 class HoloBiliDB(BaseModel):
     __coll__ = "live_data"
-    __motor_db__ = "vtbili"
+    __motor_db__ = MOTOR_DB
 
 
 class NijiBiliDB(BaseModel):
     __coll__ = "live_niji_data"
-    __motor_db__ = "vtbili"
+    __motor_db__ = MOTOR_DB
 
 
 class OtherBiliDB(BaseModel):
     __coll__ = "live_other_data"
-    __motor_db__ = "vtbili"
+    __motor_db__ = MOTOR_DB
 
 
 class OtherYTDB(BaseModel):
     __coll__ = "yt_other_livedata"
-    __motor_db__ = "vtbili"
+    __motor_db__ = MOTOR_DB
 
 
 class ChannelsBiliDB(BaseModel):
     __coll__ = "channel_data"
-    __motor_db__ = "vtbili"
+    __motor_db__ = MOTOR_DB
+
+
+class TwitchDB(BaseModel):
+    __coll__ = "other_twitch_live"
+    __motor_db__ = MOTOR_DB
+
+
+class TwitcastingDB(BaseModel):
+    __coll__ = "twitcasting_data"
+    __motor_db__ = MOTOR_DB
 
 
 class BiliScheduleModel:
@@ -58,7 +70,30 @@ class YouTubeScheduleModel:
         "Scheduled stream start time in UTC.",
         choices=[int(datetime.now(pytz.timezone("UTC")).timestamp())],
     )
-    channel = doc.String("YouTubeChannel ID.")
+    channel = doc.String("YouTube Channel ID.")
+
+
+class TwitcastLiveModel:
+    id = doc.String("A twitcasting stream ID")
+    title = doc.String("The stream title.")
+    startTime = doc.Integer(
+        "Scheduled stream start time in UTC.",
+        choices=[int(datetime.now(pytz.timezone("UTC")).timestamp())],
+    )
+    channel = doc.String("Twitcaster channel ID.")
+    webtype = doc.String(description="(Ignore this)", choices=["twitcasting"])
+
+
+class TwitchLiveModel:
+    id = doc.String("Twitch stream ID")
+    title = doc.String("The stream title.")
+    startTime = doc.Integer(
+        "Scheduled stream start time in UTC.",
+        choices=[int(datetime.now(pytz.timezone("UTC")).timestamp())],
+    )
+    channel = doc.String("Twitch channel login name or username.")
+    channel_id = doc.String("Twitch channel user ID.")
+    webtype = doc.String(description="(Ignore this)", choices=["twitch"])
 
 
 class BiliChannelsModel:
@@ -77,3 +112,22 @@ class BiliChannelsModel:
     live = doc.Boolean(
         "Is the channel currently live or not.", choices=[True, False]
     )
+
+
+class TwitchChannelModel:
+    id = doc.String("Twitch username")
+    user_id = doc.String("Twitch user id.")
+    name = doc.String("Twitch channel name.")
+    description = doc.String("The Channel Description.")
+    thumbnail = doc.String("The Channel profile picture.")
+    followerCount = doc.Integer("The channels followers count.")
+    viewCount = doc.Integer("The channels views count.")
+
+
+class TwitcastChannelModel:
+    id = doc.String("Twitcaster user id")
+    name = doc.String("Twitcaster channel name.")
+    description = doc.String("The Channel Description.")
+    thumbnail = doc.String("The Channel profile picture.")
+    followerCount = doc.Integer("The channels followers count.")
+    level = doc.Integer("The channels level.")

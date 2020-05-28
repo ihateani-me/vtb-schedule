@@ -10,10 +10,20 @@ from .models import (
     NijiBiliDB,
     OtherBiliDB,
     OtherYTDB,
+    TwitcastingDB,
+    TwitchDB,
 )
 
 # Import sanic_openapi models
-from .models import BiliChannelsModel, BiliScheduleModel, YouTubeScheduleModel
+from .models import (
+    BiliChannelsModel,
+    BiliScheduleModel,
+    TwitcastChannelModel,
+    TwitcastLiveModel,
+    TwitchChannelModel,
+    TwitchLiveModel,
+    YouTubeScheduleModel,
+)
 
 # Import all json dataset
 from .dataset import *

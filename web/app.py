@@ -17,6 +17,8 @@ from routes.hololive import holobp
 from routes.nijisanji import nijibp
 from routes.others import otherbp
 from routes.others_youtube import otherytbp
+from routes.twitcasting import twitcastbp
+from routes.twitch import twitchbp
 
 RANDOMIZED_UUID_API = str(uuid4())
 
@@ -25,7 +27,7 @@ app.blueprint(swagger_blueprint)
 settings = dict(
     MOTOR_URI="mongodb://127.0.0.1:12345/DATABASE_NAME",  # Modify this.
     # Don't modify anything below here
-    API_VERSION="0.5.0",
+    API_VERSION="0.6.0",
     API_TITLE="VTubers BiliBili Schedule API",
     API_CONTACT_EMAIL="noaione0809@gmail.com",
     API_LICENSE_NAME="MIT License",
@@ -99,10 +101,10 @@ Rate Limiting [If activated]:<br>
 - Per days: 1500 requests max (Without API Key.)<br>
 <br>
 Backend:<br>
-"""
+"""  # noqa: W605,E501
 EXTENSION_HOMEPAGE = """- Framework: Sanic v{sv} (Python {pyv})<br>
 - Database: MongoDB Community v4.2.3</code>
-"""
+"""  # noqa: W605,E501
 SCRIPTS_HOMEPAGE = r"""<script>
     const clock = document.getElementById("current_dt");
     clock.textContent = (new Date()).toString();
@@ -112,7 +114,7 @@ SCRIPTS_HOMEPAGE = r"""<script>
         1000
     );
 </script>
-"""
+"""  # noqa: W605,E501
 
 
 @app.exception(NotFound)
@@ -137,6 +139,8 @@ app.blueprint(holobp)
 app.blueprint(nijibp)
 app.blueprint(otherbp)
 app.blueprint(otherytbp)
+app.blueprint(twitcastbp)
+app.blueprint(twitchbp)
 
 
 @app.route("/")
