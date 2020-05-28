@@ -26,12 +26,8 @@ async def check_status(
 async def get_user_data(
     session: aiohttp.ClientSession, channel: str
 ) -> Tuple[Union[dict, None], str]:
-    uri = "https://frontendapi.twitcasting.tv/users/{}".format(
-        channel
-    )
-    async with session.get(
-        uri, params={"detail": True}
-    ) as resp:
+    uri = "https://frontendapi.twitcasting.tv/users/{}".format(channel)
+    async with session.get(uri, params={"detail": True}) as resp:
         json_res: dict = await resp.json()
         if resp.status != 200:
             return None, channel
@@ -48,9 +44,7 @@ async def twitcasting_channels(
     twitcast_id = [twit["id"] for twit in twitcast_data]
 
     vtlog.info("Creating tasks...")
-    twitcast_tasks = [
-        get_user_data(sessions, uid) for uid in twitcast_id
-    ]
+    twitcast_tasks = [get_user_data(sessions, uid) for uid in twitcast_id]
 
     twitcast_chan_data = []
     vtlog.info("Running all tasks...")
@@ -103,7 +97,8 @@ async def twitcasting_heartbeat(
 
     vtlog.info("Creating tasks...")
     twitcast_tasks = [
-        check_status(sessions, {"u": uid, "v": 999}, uid) for uid in twitcast_id
+        check_status(sessions, {"u": uid, "v": 999}, uid)
+        for uid in twitcast_id
     ]
 
     tmri = lambda t: int(round(t))  # noqa: E731

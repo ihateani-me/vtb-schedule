@@ -1,8 +1,7 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 
 import aiohttp
-import pytz
 
 
 class Jetri:
@@ -26,7 +25,7 @@ class Jetri:
         """Filter upcoming data from Jetri"""
         _filtered_data = []
         for upcome in upcoming_data:
-            utc_time = datetime.now(pytz.timezone("UTC")).timestamp()
+            utc_time = datetime.now(timezone.utc).timestamp()
             start_time = upcome["startTime"]
             if not isinstance(start_time, int):
                 start_time = int(start_time)

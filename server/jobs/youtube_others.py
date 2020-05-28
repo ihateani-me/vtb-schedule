@@ -200,9 +200,7 @@ async def youtube_live_heartbeat(
             strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%S.%fZ")
         except ValueError:
             strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
-        start_t = int(
-            round(strt.replace(tzinfo=timezone.utc).timestamp())
-        )
+        start_t = int(round(strt.replace(tzinfo=timezone.utc).timestamp()))
         vtlog.info(f"|--> Update status for {video_id}: {status_live}")
         for data_streams in youtube_lives_data[channel_id]:
             if data_streams["id"] == video_id:
