@@ -43,15 +43,10 @@ This API are updating automatically using cronjob:
 \- **Every 2 minutes** for BiliBili Live Streams data.
 \- **Every 4 minutes** for BiliBili Upcoming Streams data.
 \- **Every 6 hours** for Channels Info/Stats.<br><br>"""  # noqa: W605,E501
-API_DESC_LIMIT = """This API also implement a Rate Limiting:
-\- **3 requests** per **minute**
-\- **1500 requests** per **day**<br><br>"""  # noqa: W605,E501
 API_DESC_END = """You could contact me at **Discord**: _N4O#8868_
 If you need more Other VTubers to add to the list."""
 
 app.config.update(settings)
-if app.config.get("APP_IMPLEMENT_RATE_LIMIT", True):
-    API_DESC += API_DESC_LIMIT
 API_DESC += API_DESC_END
 
 app.config["API_DESCRIPTION"] = API_DESC
@@ -99,10 +94,6 @@ Refresh/Cache Rate:<br>
 - Live (Bili): Every 2 minutes<br>
 - Upcoming (YT): Every 2 minutes<br>
 - Live (YT/Twitch/Twitcasting): Every 1 minute<br>
-<br>
-Rate Limiting [If activated]:<br>
-- Per Minute: 3 requests max (Without API Key.)<br>
-- Per days: 1500 requests max (Without API Key.)<br>
 <br>
 Backend:<br>
 """  # noqa: W605,E501
