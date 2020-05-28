@@ -13,22 +13,39 @@ from jobs import (
     niji_heartbeat,
     nijisanji_main,
     others_main,
+    twitcasting_channels,
+    twitcasting_heartbeat,
+    twitch_channels,
+    twitch_heartbeat,
     update_channels_stats,
     youtube_live_heartbeat,
     youtube_video_feeds,
 )
-from jobs.utils import Jetri, VTBiliDatabase
+from jobs.utils import Jetri, TwitchHelix, VTBiliDatabase
 
 BASE_FOLDER_PATH = "./"  # Modify this
+
 MONGODB_URI = "mongodb://127.0.0.1:12345"  # Modify this
 MONGODB_DBNAME = "vtbili"  # Modify this
 YT_API_KEY = ""  # Modify this
 
+# [Twitch (OPTIONAL)]
+TWITCH_CLIENT_ID = ""  # Modify this
+TWITCH_CLIENT_SECRET = ""  # Modify this
+
+# [Interval Config]
 INTERVAL_BILI_CHANNELS = 6 * 60  # In minutes
 INTERVAL_BILI_UPCOMING = 4  # In minutes
 INTERVAL_BILI_LIVE = 2  # In minutes
+
 INTERVAL_YT_FEED = 2  # In minutes
 INTERVAL_YT_LIVE = 1  # In minutes
+
+INTERVAL_TWITCASTING_CHANNELS = 6 * 60  # In minutes
+INTERVAL_TWITCASTING_LIVE = 1  # In minutes
+
+INTERVAL_TWITCH_LIVE = 1  # In minutes
+INTERVAL_TWITCH_CHANNELS = 6 * 60  # In minutes
 
 if __name__ == "__main__":
     logfiles = os.path.join(BASE_FOLDER_PATH, "vtbili_server.log")
@@ -55,6 +72,12 @@ if __name__ == "__main__":
     )
     vtbili_db = VTBiliDatabase(MONGODB_URI, MONGODB_DBNAME)
     vtlog.info("Connected!")
+
+    tw_helix = None
+    if TWITCH_CLIENT_ID != "" and TWITCH_CLIENT_SECRET != "":
+        tw_helix = TwitchHelix(
+            TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, loop_de_loop
+        )
 
     vtlog.info("Initiating scheduler...")
     scheduler = AsyncIOScheduler()
@@ -152,6 +175,41 @@ if __name__ == "__main__":
         minutes=INTERVAL_BILI_LIVE,
     )
 
+    twcast_file = os.path.join(
+        BASE_FOLDER_PATH, "dataset", "_twitcast_data.json"
+    )
+    with open(twcast_file, "r", encoding="utf-8") as fp:
+        twcast_mapping = ujson.load(fp)
+
+    scheduler.add_job(
+        twitcasting_heartbeat,
+        "interval",
+        kwargs={"DatabaseConn": vtbili_db, "twitcast_data": twcast_mapping},
+        minutes=INTERVAL_TWITCASTING_LIVE,
+    )
+
+    scheduler.add_job(
+        twitcasting_channels,
+        "interval",
+        kwargs={"DatabaseConn": vtbili_db, "twitcast_data": twcast_mapping},
+        minutes=INTERVAL_TWITCASTING_CHANNELS,
+    )
+
+    if isinstance(tw_helix, TwitchHelix):
+        scheduler.add_job(
+            twitch_heartbeat,
+            "interval",
+            kwargs={"DatabaseConn": vtbili_db, "TwitchConn": tw_helix},
+            minutes=INTERVAL_TWITCH_LIVE,
+        )
+
+        scheduler.add_job(
+            twitch_channels,
+            "interval",
+            kwargs={"DatabaseConn": vtbili_db, "TwitchConn": tw_helix},
+            minutes=INTERVAL_TWITCH_CHANNELS,
+        )
+
     vtlog.info("Doing first run!")
     jobs_data = [
         asyncio.ensure_future(hololive_main(vtbili_db)),
@@ -168,7 +226,19 @@ if __name__ == "__main__":
         asyncio.ensure_future(
             niji_heartbeat(vtbili_db, jetri_co, ytbili_mapping)
         ),
+        asyncio.ensure_future(
+            twitcasting_heartbeat(vtbili_db, twcast_mapping)
+        ),
+        asyncio.ensure_future(twitcasting_channels(vtbili_db, twcast_mapping)),
     ]
+    if isinstance(tw_helix, TwitchHelix):
+        jobs_data.extend(
+            [
+                asyncio.ensure_future(twitch_heartbeat(vtbili_db, tw_helix)),
+                asyncio.ensure_future(twitch_channels(vtbili_db, tw_helix)),
+            ]
+        )
+
     loop_de_loop.run_until_complete(asyncio.gather(*jobs_data))
     vtlog.info("Starting scheduler!")
     scheduler.start()
@@ -178,6 +248,8 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         vtlog.info("CTRL+C Called, stopping everything...")
         loop_de_loop.run_until_complete(jetri_co.close())
+        if isinstance(tw_helix, TwitchHelix):
+            loop_de_loop.run_until_complete(tw_helix.close())
         loop_de_loop.stop()
         loop_de_loop.close()
 
