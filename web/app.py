@@ -38,7 +38,7 @@ API_DESC = """A VTubers **API endpoint** for
 the new [BiliBili scheduling system](https://live.bilibili.com/p/html/live-web-calendar).
 
 This API are updating automatically using cronjob:
-\- **Every 1 minute** for YouTube Live Streams data.
+\- **Every 1 minute** for YouTube/Twitch/Twitcasting Live Streams data.
 \- **Every 2 minutes** for YouTube Upcoming Streams data.
 \- **Every 2 minutes** for BiliBili Live Streams data.
 \- **Every 4 minutes** for BiliBili Upcoming Streams data.
@@ -85,6 +85,10 @@ Endpoint:<br>
 - <a href="/other/channels">`/other/channels`</a> to check supported "Other VTuber"<br>
 - <a href="/other/yt/live">`/other/yt/live`</a> to see upcoming/live for some other vtuber.<br>
 - <a href="/other/yt/channels">`/other/yt/channels`</a> to see supported channels for youtube version of other vtuber.<br>
+- <a href="/twitcasting/live">`/twitcasting/live`</a> for Twitcasting streams<br>
+- <a href="/twitcasting/channels">`/twitcasting/channels`</a> for Twitcaster channels stats<br>
+- <a href="/twitch/live">`/twitch/live`</a> for Twitch streams<br>
+- <a href="/twitch/channels">`/twitch/channels`</a> for Twitch channels stats<br>
 <br>
 Dataset Used:<br>
 - vtbs.moe<br>
@@ -94,7 +98,7 @@ Refresh/Cache Rate:<br>
 - Upcoming (Bili): Every 4 minutes<br>
 - Live (Bili): Every 2 minutes<br>
 - Upcoming (YT): Every 2 minutes<br>
-- Live (YT): Every 1 minute<br>
+- Live (YT/Twitch/Twitcasting): Every 1 minute<br>
 <br>
 Rate Limiting [If activated]:<br>
 - Per Minute: 3 requests max (Without API Key.)<br>
