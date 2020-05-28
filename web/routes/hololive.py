@@ -52,6 +52,7 @@ async def hololiveup_api(request):
         },
         dumps=ujson.dumps,
         ensure_ascii=False,
+        escape_forward_slashes=False,
     )
 
 
@@ -73,5 +74,8 @@ async def hololiveup_api(request):
 async def holochan_api(request):
     logger.info(f"Requested {request.path} data")
     return json(
-        await fetch_channels("hololive"), dumps=ujson.dumps, ensure_ascii=False
+        await fetch_channels("hololive"),
+        dumps=ujson.dumps,
+        ensure_ascii=False,
+        escape_forward_slashes=False,
     )

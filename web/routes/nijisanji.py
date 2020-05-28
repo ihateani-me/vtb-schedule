@@ -52,6 +52,7 @@ async def nijiliveup_api(request):
         },
         dumps=ujson.dumps,
         ensure_ascii=False,
+        escape_forward_slashes=False,
     )
 
 
@@ -76,4 +77,5 @@ async def nijichan_api(request):
         await fetch_channels("nijisanji"),
         dumps=ujson.dumps,
         ensure_ascii=False,
+        escape_forward_slashes=False,
     )

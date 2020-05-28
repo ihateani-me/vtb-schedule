@@ -54,6 +54,7 @@ async def upcoming_live_other_yt(request):
         {"live": current_lives, "upcoming": upcoming_data, "cached": True},
         dumps=ujson.dumps,
         ensure_ascii=False,
+        escape_forward_slashes=False,
     )
 
 
@@ -91,4 +92,5 @@ async def upcoming_channels_other_yt(request):
         dumps=ujson.dumps,
         ensure_ascii=False,
         indent=4,
+        escape_forward_slashes=False,
     )

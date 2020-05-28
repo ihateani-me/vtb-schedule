@@ -49,6 +49,7 @@ async def otheupcoming_api(request):
         await parse_uuids_args(request.args, upcoming_results),
         dumps=ujson.dumps,
         ensure_ascii=False,
+        escape_forward_slashes=False,
     )
 
 
@@ -70,5 +71,8 @@ async def otheupcoming_api(request):
 async def othechan_api(request):
     logger.info(f"Requested {request.path} data")
     return json(
-        await fetch_channels("other"), dumps=ujson.dumps, ensure_ascii=False
+        await fetch_channels("other"),
+        dumps=ujson.dumps,
+        ensure_ascii=False,
+        escape_forward_slashes=False,
     )
