@@ -18,6 +18,7 @@ from jobs import (
     twitch_channels,
     twitch_heartbeat,
     update_channels_stats,
+    youtube_channels,
     youtube_live_heartbeat,
     youtube_video_feeds,
 )
@@ -38,6 +39,7 @@ INTERVAL_BILI_CHANNELS = 6 * 60  # In minutes
 INTERVAL_BILI_UPCOMING = 4  # In minutes
 INTERVAL_BILI_LIVE = 2  # In minutes
 
+INTERVAL_YT_CHANNELS = 6 * 60  # In minutes
 INTERVAL_YT_FEED = 2  # In minutes
 INTERVAL_YT_LIVE = 1  # In minutes
 
@@ -130,6 +132,17 @@ if __name__ == "__main__":
     )
 
     scheduler.add_job(
+        youtube_channels,
+        "interval",
+        kwargs={
+            "DatabaseConn": vtbili_db,
+            "dataset": others_yt_dataset,
+            "yt_api_key": YT_API_KEY,
+        },
+        minutes=INTERVAL_YT_CHANNELS,
+    )
+
+    scheduler.add_job(
         youtube_video_feeds,
         "interval",
         kwargs={
@@ -196,10 +209,21 @@ if __name__ == "__main__":
     )
 
     if isinstance(tw_helix, TwitchHelix):
+
+        twch_file = os.path.join(
+            BASE_FOLDER_PATH, "dataset", "_twitchdata_other.json"
+        )
+        with open(twch_file, "r", encoding="utf-8") as fp:
+            twch_mapping = ujson.load(fp)
+
         scheduler.add_job(
             twitch_heartbeat,
             "interval",
-            kwargs={"DatabaseConn": vtbili_db, "TwitchConn": tw_helix},
+            kwargs={
+                "DatabaseConn": vtbili_db,
+                "TwitchConn": tw_helix,
+                "twitch_dataset": twch_mapping,
+            },
             minutes=INTERVAL_TWITCH_LIVE,
         )
 
@@ -221,6 +245,9 @@ if __name__ == "__main__":
             youtube_video_feeds(vtbili_db, others_yt_dataset, YT_API_KEY)
         ),
         asyncio.ensure_future(
+            youtube_channels(vtbili_db, others_yt_dataset, YT_API_KEY)
+        ),
+        asyncio.ensure_future(
             holo_heartbeat(vtbili_db, jetri_co, ytbili_mapping)
         ),
         asyncio.ensure_future(
@@ -234,7 +261,9 @@ if __name__ == "__main__":
     if isinstance(tw_helix, TwitchHelix):
         jobs_data.extend(
             [
-                asyncio.ensure_future(twitch_heartbeat(vtbili_db, tw_helix)),
+                asyncio.ensure_future(
+                    twitch_heartbeat(vtbili_db, tw_helix, twch_mapping)
+                ),
                 asyncio.ensure_future(twitch_channels(vtbili_db, tw_helix)),
             ]
         )
