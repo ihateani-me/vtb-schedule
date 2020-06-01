@@ -81,8 +81,8 @@ async def twitcasting_channels(
         twitcast_chan_data.sort(key=lambda x: x["id"])
 
     vtlog.info("Updating database...")
-    upd_data = {"twitcasting": twitcast_chan_data}
-    await DatabaseConn.update_data("channel_data", upd_data)
+    upd_data = {"channels": twitcast_chan_data}
+    await DatabaseConn.update_data("twitcasting_data", upd_data)
     await sessions.close()
 
 
