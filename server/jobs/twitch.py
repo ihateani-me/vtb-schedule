@@ -15,6 +15,12 @@ TWITCH_USERNAMES = [
 ]
 
 
+async def find_channel_id(user_id: str, dataset: list):
+    for data in dataset:
+        if data["user_id"] == user_id:
+            return data["id"]
+
+
 async def twitch_channels(
     DatabaseConn: VTBiliDatabase, TwitchConn: TwitchHelix
 ):
@@ -41,17 +47,18 @@ async def twitch_channels(
 
         channels_data.append(data)
 
-    upd_data = {"twitch": channels_data}
+    upd_data = {"channels": channels_data}
     vtlog.info("Updating database...")
-    await DatabaseConn.update_data("channel_data", upd_data)
+    await DatabaseConn.update_data("twitch_data", upd_data)
 
 
 async def twitch_heartbeat(
-    DatabaseConn: VTBiliDatabase, TwitchConn: TwitchHelix
+    DatabaseConn: VTBiliDatabase, TwitchConn: TwitchHelix, twitch_dataset: list
 ):
     vtlog = logging.getLogger("twitch_heartbeat")
+    twitch_usernames = [user["id"] for user in twitch_dataset]
     vtlog.info("Fetching Twitch API...")
-    twitch_results = await TwitchConn.fetch_live_data(TWITCH_USERNAMES)
+    twitch_results = await TwitchConn.fetch_live_data(twitch_usernames)
 
     if not twitch_results:
         vtlog.warn("No one is live right now, bailing...")
@@ -61,7 +68,8 @@ async def twitch_heartbeat(
     lives_data = []
     for result in twitch_results:
         start_time = result["started_at"]
-        stream_id = f"twitch{result['id']}"
+
+        login_name = await find_channel_id(result["user_id"], twitch_dataset)
 
         start_utc = (
             datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
@@ -70,10 +78,10 @@ async def twitch_heartbeat(
         )
 
         data = {
-            "id": stream_id,
+            "id": result["id"],
             "title": result["title"],
             "startTime": start_utc,
-            "channel": result["user_name"],
+            "channel": login_name,
             "channel_id": result["user_id"],
             "webtype": "twitch",
         }
@@ -81,4 +89,4 @@ async def twitch_heartbeat(
 
     upd_data = {"live": lives_data}
     vtlog.info("Updating database...")
-    await DatabaseConn.update_data("other_twitch_live", upd_data)
+    await DatabaseConn.update_data("twitch_data", upd_data)
