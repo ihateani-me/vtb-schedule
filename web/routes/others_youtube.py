@@ -7,7 +7,8 @@ import ujson
 from utils.dbconn import (
     fetch_data,
     fetch_otheryt,
-    fetch_yt_channels,
+    fetch_channels,
+    otheryt_channels_data,
 )
 from utils.models import YouTubeScheduleModel
 
@@ -80,17 +81,15 @@ async def upcoming_live_other_yt(request):
     description="A list of channels",
     content_type="application/json",
 )
-async def upcoming_channels_other_yt(request):
+async def channels_other_yt(request):
     logger.info(f"Requested {request.path} data")
-    vlivers_chan = await fetch_yt_channels()
-
-    if not vlivers_chan:
-        return json({"channels": [], "cached": False}, dumps=ujson.dumps)
-
+    channel_res = await fetch_channels("ch_otheryt", otheryt_channels_data)
     return json(
-        {"channels": vlivers_chan["data"], "cached": True},
+        {
+            "channels": channel_res["channels"],
+            "cached": True
+        },
         dumps=ujson.dumps,
         ensure_ascii=False,
-        indent=4,
         escape_forward_slashes=False,
     )

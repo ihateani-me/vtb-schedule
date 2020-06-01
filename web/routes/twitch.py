@@ -8,6 +8,7 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_twitch,
+    twitch_channels_data,
 )
 from utils.models import TwitchChannelModel, TwitchLiveModel
 
@@ -58,8 +59,12 @@ async def twitch_live(request):
 )
 async def twitch_chan(request):
     logger.info(f"Requested {request.path} data")
+    channel_res = await fetch_channels("ch_twitch", twitch_channels_data)
     return json(
-        await fetch_channels("twitch"),
+        {
+            "channels": channel_res["channels"],
+            "cached": True
+        },
         dumps=ujson.dumps,
         ensure_ascii=False,
         escape_forward_slashes=False,

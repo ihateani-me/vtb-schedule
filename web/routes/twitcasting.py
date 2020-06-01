@@ -8,6 +8,7 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_twitcasting,
+    twitcast_channels_data,
 )
 from utils.models import TwitcastChannelModel, TwitcastLiveModel
 
@@ -58,8 +59,12 @@ async def twitcast_live(request):
 )
 async def twitcast_chan(request):
     logger.info(f"Requested {request.path} data")
+    channel_res = await fetch_channels("ch_twitcast", twitcast_channels_data)
     return json(
-        await fetch_channels("twitcasting"),
+        {
+            "channels": channel_res["channels"],
+            "cached": True
+        },
         dumps=ujson.dumps,
         ensure_ascii=False,
         escape_forward_slashes=False,

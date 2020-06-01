@@ -8,6 +8,7 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_otherbili,
+    otherbili_channels_data,
     parse_uuids_args,
 )
 from utils.models import (
@@ -70,9 +71,14 @@ async def otheupcoming_api(request):
 )
 async def othechan_api(request):
     logger.info(f"Requested {request.path} data")
+    channel_res = await fetch_channels("ch_otherbili", otherbili_channels_data)
     return json(
-        await fetch_channels("other"),
+        {
+            "channels": channel_res["channels"],
+            "cached": True
+        },
         dumps=ujson.dumps,
         ensure_ascii=False,
         escape_forward_slashes=False,
     )
+

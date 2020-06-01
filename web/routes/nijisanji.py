@@ -8,6 +8,7 @@ from utils.dbconn import (
     fetch_channels,
     fetch_data,
     fetch_nijibili,
+    nijisanji_channels_data,
     parse_uuids_args,
 )
 from utils.models import BiliChannelsModel, BiliScheduleModel
@@ -73,8 +74,12 @@ async def nijiliveup_api(request):
 )
 async def nijichan_api(request):
     logger.info(f"Requested {request.path} data")
+    channel_res = await fetch_channels("ch_niji", nijisanji_channels_data)
     return json(
-        await fetch_channels("nijisanji"),
+        {
+            "channels": channel_res["channels"],
+            "cached": True
+        },
         dumps=ujson.dumps,
         ensure_ascii=False,
         escape_forward_slashes=False,
