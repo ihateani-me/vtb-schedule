@@ -137,4 +137,4 @@ async def nijisanji_main(DatabaseConn: VTBiliDatabase):
 
     vtlog.info("Updating database...")
     upd_data = {"upcoming": calendar_data}
-    await DatabaseConn.update_data("live_niji_data", upd_data)
+    await DatabaseConn.update_data("nijisanji_data", upd_data)

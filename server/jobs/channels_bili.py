@@ -47,6 +47,8 @@ async def main_process_loop(channels_uids):
     vtlog.info("Running all tasks...")
     for task in asyncio.as_completed(fetch_tasks):
         channel_data, ident, nsort = await task
+        if not channel_data:
+            continue
         if ident in ("hololive", "hololivecn", "holostars", "hololiveid"):
             hololivers.append(
                 {
@@ -136,5 +138,15 @@ async def update_channels_stats(
 
     vtlog.info("Processing...")
     final_data = await main_process_loop(channels_uids)
-    vtlog.info("Updating DB data...")
-    await DatabaseConn.update_data("channel_data", final_data)
+    vtlog.info("Updating DB data for Hololive...")
+    await DatabaseConn.update_data(
+        "hololive_data", {"channels": final_data["hololive"]}
+    )
+    vtlog.info("Updating DB data for Nijisanji...")
+    await DatabaseConn.update_data(
+        "nijisanji_data", {"channels": final_data["nijisanji"]}
+    )
+    vtlog.info("Updating DB data for Others...")
+    await DatabaseConn.update_data(
+        "otherbili_data", {"channels": final_data["other"]}
+    )

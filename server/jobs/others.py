@@ -78,4 +78,4 @@ async def others_main(DatabaseConn: VTBiliDatabase, dataset_path: str):
 
     vtlog.info("Updating database...")
     upd_data = {"upcoming": calendar_data}
-    await DatabaseConn.update_data("live_other_data", upd_data)
+    await DatabaseConn.update_data("otherbili_data", upd_data)

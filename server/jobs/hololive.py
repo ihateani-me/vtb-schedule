@@ -113,4 +113,4 @@ async def hololive_main(DatabaseConn: VTBiliDatabase):
 
     vtlog.info("Updating database...")
     upd_data = {"upcoming": calendar_data}
-    await DatabaseConn.update_data("live_data", upd_data)
+    await DatabaseConn.update_data("hololive_data", upd_data)
