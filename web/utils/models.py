@@ -8,17 +8,17 @@ MOTOR_DB = "vtbili"
 
 
 class HoloBiliDB(BaseModel):
-    __coll__ = "live_data"
+    __coll__ = "hololive_data"
     __motor_db__ = MOTOR_DB
 
 
 class NijiBiliDB(BaseModel):
-    __coll__ = "live_niji_data"
+    __coll__ = "nijisanji_data"
     __motor_db__ = MOTOR_DB
 
 
 class OtherBiliDB(BaseModel):
-    __coll__ = "live_other_data"
+    __coll__ = "otherbili_data"
     __motor_db__ = MOTOR_DB
 
 
@@ -27,13 +27,13 @@ class OtherYTDB(BaseModel):
     __motor_db__ = MOTOR_DB
 
 
-class ChannelsBiliDB(BaseModel):
-    __coll__ = "channel_data"
+class OtherYTChannelsDB(BaseModel):
+    __coll__ = "yt_other_channels"
     __motor_db__ = MOTOR_DB
 
 
 class TwitchDB(BaseModel):
-    __coll__ = "other_twitch_live"
+    __coll__ = "twitch_data"
     __motor_db__ = MOTOR_DB
 
 

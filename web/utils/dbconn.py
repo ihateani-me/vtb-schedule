@@ -4,10 +4,10 @@ from sanic.log import logger
 
 from .dataset import OTHER_YT_DATASET
 from .models import (
-    ChannelsBiliDB,
     HoloBiliDB,
     NijiBiliDB,
     OtherBiliDB,
+    OtherYTChannelsDB,
     OtherYTDB,
     TwitcastingDB,
     TwitchDB,
@@ -15,7 +15,7 @@ from .models import (
 
 
 @cached(
-    key="holobili", ttl=180, serializer=JsonSerializer(),
+    key="holobili", ttl=60, serializer=JsonSerializer(),
 )
 async def fetch_holobili():
     try:
@@ -38,7 +38,7 @@ async def fetch_holobili():
 
 
 @cached(
-    key="nijibili", ttl=180, serializer=JsonSerializer(),
+    key="nijibili", ttl=60, serializer=JsonSerializer(),
 )
 async def fetch_nijibili():
     try:
@@ -61,7 +61,7 @@ async def fetch_nijibili():
 
 
 @cached(
-    key="otherbili", ttl=180, serializer=JsonSerializer(),
+    key="otherbili", ttl=60, serializer=JsonSerializer(),
 )
 async def fetch_otherbili():
     try:
@@ -138,34 +138,93 @@ async def fetch_twitcasting():
 
 
 @cached(
-    key="channels", ttl=7200, serializer=JsonSerializer(),
+    key="ch_holo", ttl=7200, serializer=JsonSerializer()
 )
-async def fetch_channels_data():
+async def hololive_channels_data():
     try:
-        logger.debug("Fetching channels database...")
-        data = await ChannelsBiliDB.find_one()
+        logger.debug("Fetching (HoloLive) database...")
+        data = await HoloBiliDB.find_one()
     except Exception as e:
         logger.debug(e)
         logger.debug("Failed to fetch database, returning...")
-        return {"hololive": [], "nijisanji": [], "other": [], "cached": False}
+        return {"channels": []}
     logger.info("Returning...")
-    return {
-        "hololive": data["hololive"],
-        "nijisanji": data["nijisanji"],
-        "other": data["other"],
-        "twitcasting": data["twitcasting"],
-        "twitch": data["twitch"],
-        "cached": True,
-    }
+    return {"channels": data["channels"]}
 
 
 @cached(
-    key="otherytchan", ttl=7200, serializer=JsonSerializer(),
+    key="ch_niji", ttl=7200, serializer=JsonSerializer()
 )
-async def fetch_otheryt_channels():
-    # try:
-    logger.debug("Fetching channels database...")
-    return {"data": OTHER_YT_DATASET}
+async def nijisanji_channels_data():
+    try:
+        logger.debug("Fetching (Nijisanji) database...")
+        data = await NijiBiliDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"channels": []}
+    logger.info("Returning...")
+    return {"channels": data["channels"]}
+
+
+@cached(
+    key="ch_otherbili", ttl=7200, serializer=JsonSerializer()
+)
+async def otherbili_channels_data():
+    try:
+        logger.debug("Fetching (OtherBili) database...")
+        data = await OtherBiliDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"channels": []}
+    logger.info("Returning...")
+    return {"channels": data["channels"]}
+
+
+@cached(
+    key="ch_otheryt", ttl=7200, serializer=JsonSerializer(),
+)
+async def otheryt_channels_data():
+    try:
+        logger.debug("Fetching (YT Channels) database...")
+        data = await OtherYTChannelsDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"channels": []}
+    logger.info("Returning...")
+    return {"channels": data["channels"]}
+
+
+@cached(
+    key="ch_twitcast", ttl=7200, serializer=JsonSerializer(),
+)
+async def twitcast_channels_data():
+    try:
+        logger.debug("Fetching (Twitcasting) database...")
+        data = await TwitcastingDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"channels": []}
+    logger.info("Returning...")
+    return {"channels": data["channels"]}
+
+
+@cached(
+    key="ch_twitch", ttl=7200, serializer=JsonSerializer(),
+)
+async def twitch_channels_data():
+    try:
+        logger.debug("Fetching (Twitch) database...")
+        data = await TwitchDB.find_one()
+    except Exception as e:
+        logger.debug(e)
+        logger.debug("Failed to fetch database, returning...")
+        return {"channels": []}
+    logger.info("Returning...")
+    return {"channels": data["channels"]}
 
 
 cache = Cache(serializer=JsonSerializer())
@@ -189,36 +248,18 @@ async def fetch_data(keyname: str, fallback_func, recache=False):
     return data
 
 
-async def fetch_channels(vliver):
-    logger.debug(f"Fetching {vliver} channels data...")
+async def fetch_channels(keyname: str, fallback_func):
+    logger.debug("Trying to fetch channels data...")
     try:
-        vlivers_chan = await cache.get("channels")
-        if not vlivers_chan:
+        data = await cache.get(keyname)
+        if not data:
             logger.debug("No cache found, fetching to remote DB.")
-            vlivers_chan = await fetch_channels_data()
+            data = await fallback_func()
         logger.debug("Cache found, using cache...")
     except Exception:
-        logger.debug("Failed fetching cache, fetching to remote db...")
-        vlivers_chan = await fetch_channels_data()
-
-    if vliver not in vlivers_chan:
-        logger.warn("Unknown vliver data, returning empty array...")
-        return {"channels": [], "cached": False}
-    return {"channels": vlivers_chan[vliver], "cached": True}
-
-
-async def fetch_yt_channels():
-    logger.debug(f"Fetching others youtube channels data...")
-    try:
-        vlivers_chan = await cache.get("otherytchan")
-        if not vlivers_chan:
-            logger.debug("No cache found, fetching to remote DB.")
-            vlivers_chan = await fetch_otheryt_channels()
-        logger.debug("Cache found, using cache...")
-    except Exception:
-        logger.debug("Failed fetching cache, fetching to remote db...")
-        vlivers_chan = await fetch_otheryt_channels()
-    return vlivers_chan
+        logger.debug("Failed fetching cache...")
+        data = await fallback_func()
+    return data
 
 
 async def parse_uuids_args(args, fetched_results):
