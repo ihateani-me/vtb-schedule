@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 import aiohttp
 import feedparser
-from .utils import VTBiliDatabase
+from .utils import RotatingAPIKey, VTBiliDatabase
 
 import ujson
 
@@ -31,10 +31,10 @@ async def fetch_apis(
 
 
 async def youtube_video_feeds(
-    DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: str
+    DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: RotatingAPIKey
 ):
     vtlog = logging.getLogger("yt_videos_feeds")
-    sessions = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.6.0"})
+    sessions = aiohttp.ClientSession(headers={"User-Agent": "VTBSchedule/0.6.1"})
 
     vtlog.debug("Opening dataset")
     with open(dataset, "r", encoding="utf-8") as fp:
@@ -86,7 +86,7 @@ async def youtube_video_feeds(
         param = {
             "part": "snippet,liveStreamingDetails",
             "id": ",".join(videos),
-            "key": yt_api_key,
+            "key": yt_api_key.get(),
         }
         vtlog.info(f"|-- Processing: {chan}")
         video_to_fetch.append(fetch_apis(sessions, "videos", param, chan))
@@ -156,10 +156,10 @@ async def youtube_video_feeds(
 
 
 async def youtube_live_heartbeat(
-    DatabaseConn: VTBiliDatabase, yt_api_key: str
+    DatabaseConn: VTBiliDatabase, yt_api_key: RotatingAPIKey
 ):
     vtlog = logging.getLogger("yt_live_heartbeat")
-    session = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.6.0"})
+    session = aiohttp.ClientSession(headers={"User-Agent": "VTBSchedule/0.6.1"})
 
     vtlog.info("Fetching live data...")
 
@@ -167,8 +167,11 @@ async def youtube_live_heartbeat(
     del youtube_lives_data["_id"]
 
     videos_list = []
+    videos_set = {}
     for cid, data in youtube_lives_data.items():
-        videos_list.extend([v["id"] for v in data])
+        for vd in data:
+            videos_list.append(vd["id"])
+            videos_set[vd["id"]] = cid
 
     if not videos_list:
         vtlog.warn("No live/upcoming videos, bailing!")
@@ -179,11 +182,12 @@ async def youtube_live_heartbeat(
     param = {
         "part": "snippet,liveStreamingDetails",
         "id": ",".join(videos_list),
-        "key": yt_api_key,
+        "key": yt_api_key.get(),
     }
     items_data, _ = await fetch_apis(session, "videos", param, "nullify")
     await session.close()
 
+    parsed_ids = {}
     vtlog.info(f"Parsing results...")
     for res_item in items_data["items"]:
         video_id = res_item["id"]
@@ -193,7 +197,6 @@ async def youtube_live_heartbeat(
         if "liveStreamingDetails" not in res_item:
             continue
         livedetails = res_item["liveStreamingDetails"]
-        new_streams_data = []
         status_live = "upcoming"
         strt = livedetails["scheduledStartTime"]
         if "actualStartTime" in livedetails:
@@ -207,6 +210,7 @@ async def youtube_live_heartbeat(
             strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
         start_t = int(round(strt.replace(tzinfo=timezone.utc).timestamp()))
         vtlog.info(f"|--> Update status for {video_id}: {status_live}")
+        new_streams_data = []
         for data_streams in youtube_lives_data[channel_id]:
             if data_streams["id"] == video_id:
                 if status_live != "delete":
@@ -221,16 +225,29 @@ async def youtube_live_heartbeat(
             else:
                 new_streams_data.append(data_streams)
         youtube_lives_data[channel_id] = new_streams_data
+        parsed_ids[video_id] = channel_id
+
+    vtlog.info("|= Filtering out some data...")
+    parsed_ids_key = list(parsed_ids.keys())
+    for video in videos_list:
+        if video not in parsed_ids_key:
+            chan_id = videos_set[video]
+            channel_data = youtube_lives_data[chan_id]
+            new_channel_data = []
+            for vidchan in channel_data:
+                if vidchan["id"] != video:
+                    new_channel_data.append(vidchan)
+            youtube_lives_data[chan_id] = new_channel_data
 
     vtlog.info("|-- Updating database...")
     await DatabaseConn.update_data("yt_other_livedata", youtube_lives_data)
 
 
 async def youtube_channels(
-    DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: str
+    DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: RotatingAPIKey
 ):
     vtlog = logging.getLogger("yt_channels")
-    sessions = aiohttp.ClientSession(headers={"User-Agent": "VTHellAPI/0.6.0"})
+    sessions = aiohttp.ClientSession(headers={"User-Agent": "VTBSchedule/0.6.1"})
 
     vtlog.debug("Opening dataset")
     with open(dataset, "r", encoding="utf-8") as fp:
@@ -243,7 +260,7 @@ async def youtube_channels(
         param = {
             "part": "snippet,statistics",
             "id": channel["id"],
-            "key": yt_api_key,
+            "key": yt_api_key.get(),
         }
         channels_tasks.append(
             fetch_apis(sessions, "channels", param, channel["name"])
