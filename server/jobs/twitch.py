@@ -62,14 +62,26 @@ async def twitch_heartbeat(
 
     if not twitch_results:
         vtlog.warn("No one is live right now, bailing...")
+        await DatabaseConn.update_data("twitch_data", {"live": []})
         return 1
 
     vtlog.info("Parsing results...")
     lives_data = []
     for result in twitch_results:
+        if "type" in result:
+            if result["type"] == "":
+                vtlog.warn(f"|= Skipping: {result['user_id']}")
+                continue
         start_time = result["started_at"]
 
         login_name = await find_channel_id(result["user_id"], twitch_dataset)
+        vtlog.info(f"|= Processing: {login_name}")
+
+        thumbnail = result["thumbnail_url"]
+        try:
+            thumbnail = thumbnail.format(width="1280", height="720")
+        except:
+            pass
 
         start_utc = (
             datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%SZ")
@@ -83,6 +95,7 @@ async def twitch_heartbeat(
             "startTime": start_utc,
             "channel": login_name,
             "channel_id": result["user_id"],
+            "thumbnail": thumbnail,
             "webtype": "twitch",
         }
         lives_data.append(data)
