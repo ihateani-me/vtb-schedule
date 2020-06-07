@@ -13,7 +13,7 @@ class Jetri:
         if not loop:
             loop = asyncio.get_event_loop()
         self._sess = aiohttp.ClientSession(
-            headers={"User-Agent": "VTBiliAPI/0.5.0"}, loop=loop
+            headers={"User-Agent": "VTBSchedule/0.6.1"}, loop=loop
         )
 
     async def close(self):
