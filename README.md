@@ -2,6 +2,8 @@
 A wrapper around BiliBili Calendar (Scheduling system) into a readable API.<br>
 *(Oh, also some Youtube channels, I guess)*
 
+![API Status](https://img.shields.io/uptimerobot/status/m784962983-62a53810138b9371bbb3dc27?label=API%20Status&style=for-the-badge) ![API Uptime (7 days)](https://img.shields.io/uptimerobot/ratio/7/m784962983-62a53810138b9371bbb3dc27?label=API%20Uptime&style=for-the-badge) ![Code Style](https://img.shields.io/badge/code%20style-black-RGB(0%2C0%2C0)?style=for-the-badge)
+
 Still WIP!
 
 **Currently running on:** [api.ihateani.me](https://api.ihateani.me)
