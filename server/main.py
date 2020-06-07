@@ -22,13 +22,20 @@ from jobs import (
     youtube_live_heartbeat,
     youtube_video_feeds,
 )
-from jobs.utils import Jetri, TwitchHelix, VTBiliDatabase
+from jobs.utils import Jetri, RotatingAPIKey, TwitchHelix, VTBiliDatabase
 
 BASE_FOLDER_PATH = "./"  # Modify this
 
 MONGODB_URI = "mongodb://127.0.0.1:12345"  # Modify this
 MONGODB_DBNAME = "vtbili"  # Modify this
-YT_API_KEY = ""  # Modify this
+
+# Modify this
+# You can add more and more API keys if you want.
+YT_API_KEYS = [
+    ""
+]
+# Used to rotate between multiple YT API Keys (If you have multiple API keys)
+API_KEY_ROTATION_RATE = 60  # In minutes
 
 # [Twitch (OPTIONAL)]
 TWITCH_CLIENT_ID = ""  # Modify this
@@ -48,6 +55,7 @@ INTERVAL_TWITCASTING_LIVE = 1  # In minutes
 
 INTERVAL_TWITCH_LIVE = 1  # In minutes
 INTERVAL_TWITCH_CHANNELS = 6 * 60  # In minutes
+
 
 if __name__ == "__main__":
     logfiles = os.path.join(BASE_FOLDER_PATH, "vtbili_server.log")
@@ -80,6 +88,8 @@ if __name__ == "__main__":
         tw_helix = TwitchHelix(
             TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, loop_de_loop
         )
+
+    yt_api_rotate = RotatingAPIKey(YT_API_KEYS, API_KEY_ROTATION_RATE)
 
     vtlog.info("Initiating scheduler...")
     scheduler = AsyncIOScheduler()
@@ -137,7 +147,7 @@ if __name__ == "__main__":
         kwargs={
             "DatabaseConn": vtbili_db,
             "dataset": others_yt_dataset,
-            "yt_api_key": YT_API_KEY,
+            "yt_api_key": yt_api_rotate,
         },
         minutes=INTERVAL_YT_CHANNELS,
     )
@@ -148,7 +158,7 @@ if __name__ == "__main__":
         kwargs={
             "DatabaseConn": vtbili_db,
             "dataset": others_yt_dataset,
-            "yt_api_key": YT_API_KEY,
+            "yt_api_key": yt_api_rotate,
         },
         minutes=INTERVAL_YT_FEED,
     )
@@ -156,7 +166,7 @@ if __name__ == "__main__":
     scheduler.add_job(
         youtube_live_heartbeat,
         "interval",
-        kwargs={"DatabaseConn": vtbili_db, "yt_api_key": YT_API_KEY},
+        kwargs={"DatabaseConn": vtbili_db, "yt_api_key": yt_api_rotate},
         minutes=INTERVAL_YT_LIVE,
     )
 
@@ -240,12 +250,14 @@ if __name__ == "__main__":
         asyncio.ensure_future(nijisanji_main(vtbili_db)),
         asyncio.ensure_future(others_main(vtbili_db, others_dataset)),
         asyncio.ensure_future(update_channels_stats(vtbili_db, dataset_all)),
-        asyncio.ensure_future(youtube_live_heartbeat(vtbili_db, YT_API_KEY)),
         asyncio.ensure_future(
-            youtube_video_feeds(vtbili_db, others_yt_dataset, YT_API_KEY)
+            youtube_live_heartbeat(vtbili_db, yt_api_rotate)
         ),
         asyncio.ensure_future(
-            youtube_channels(vtbili_db, others_yt_dataset, YT_API_KEY)
+            youtube_video_feeds(vtbili_db, others_yt_dataset, yt_api_rotate)
+        ),
+        asyncio.ensure_future(
+            youtube_channels(vtbili_db, others_yt_dataset, yt_api_rotate)
         ),
         asyncio.ensure_future(
             holo_heartbeat(vtbili_db, jetri_co, ytbili_mapping)
