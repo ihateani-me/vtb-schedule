@@ -1,15 +1,41 @@
 import asyncio
 import logging
 from datetime import datetime
+from typing import Tuple
 
 import aiohttp
 
-from .utils import VTBiliDatabase, Jetri
+from .utils import Jetri, VTBiliDatabase
 
 CHROME_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"  # noqa: E501
 
 
-async def fetch_room(session: aiohttp.ClientSession, room_id: str) -> dict:
+async def fetch_room_hls(
+    session: aiohttp.ClientSession, room_id: str
+) -> Tuple[dict, str]:
+    parameter = {
+        "cid": room_id,
+        "quality": 4,
+        "platform": "h5",
+        "otype": "json",
+    }
+    async with session.get(
+        "https://api.live.bilibili.com/room/v1/Room/playUrl", params=parameter
+    ) as res:
+        try:
+            items_data = await res.json()
+        except ValueError:
+            return {}, room_id
+        if res.status != 200:
+            return {}, room_id
+    if "data" not in items_data:
+        return {}, room_id
+    return items_data["data"], room_id
+
+
+async def fetch_room(
+    session: aiohttp.ClientSession, room_id: str
+) -> Tuple[dict, str]:
     parameter = {"room_id": room_id}
     async with session.get(
         "https://api.live.bilibili.com/room/v1/Room/get_info", params=parameter
@@ -32,10 +58,14 @@ async def holo_heartbeat(
     vtlog.info("Fetching currently live from Jetri...")
     holo_liveyt, _ = await JetriConn.fetch_lives()
     holo_data: dict = room_dataset["holo"]
+    vtlog.info("Fetching ignored room data from database...")
+    holo_ignored = await DatabaseConn.fetch_data("hololive_ignored")
+    holo_ignored: list = holo_ignored["data"]
 
     collect_live_channels = []
     for vt in holo_liveyt:
-        collect_live_channels.append(vt["channel"])
+        if vt["platform"] == "youtube":
+            collect_live_channels.append(vt["channel"])
 
     vtlog.info("Creating tasks to check room status...")
     room_to_fetch = [fetch_room(session, room) for room in holo_data.keys()]
@@ -49,6 +79,8 @@ async def holo_heartbeat(
             continue
         if room_data["live_status"] != 1:
             continue
+        thumbnail = room_data["user_cover"]
+        viewers = room_data["online"]
         start_time = int(
             round(
                 datetime.strptime(
@@ -58,15 +90,22 @@ async def holo_heartbeat(
         ) - (
             8 * 60 * 60
         )  # Set to UTC
+        gen_id = f"bili{room_id}_{start_time}"
+        if gen_id in holo_ignored:
+            vtlog.warn(
+                f"Ignoring {room_id} since it's an Ignored restream..."
+            )
+            continue
         if str(room_id) in holo_data:
             holo_map = holo_data[str(room_id)]
             if "id" in holo_map and holo_map["id"] in collect_live_channels:
                 vtlog.warn(
                     f"Ignoring {room_id} since it's a YouTube restream..."
                 )
+                if gen_id not in holo_ignored:
+                    holo_ignored.append(gen_id)
                 continue
         vtlog.info(f"Adding room_id: {room_id}")
-        gen_id = f"bili{room_id}_{start_time}"
         dd = {
             "id": gen_id,
             "room_id": int(room_id),
@@ -74,25 +113,20 @@ async def holo_heartbeat(
             "startTime": start_time,
             "channel": str(room_data["uid"]),
             "channel_name": holo_data[str(room_id)]["name"],
+            "thumbnail": thumbnail,
+            "viewers": viewers,
+            "platform": "bilibili",
         }
         final_results.append(dd)
-
-    if not final_results:
-        vtlog.warn("No live currently happening, checking database...")
-        current_lives = await DatabaseConn.fetch_data("hololive_data")
-        if current_lives["live"]:
-            vtlog.warn("There's live happening right now, flushing...")
-            await DatabaseConn.update_data("hololive_data", {"live": []})
-        vtlog.warn("Bailing!")
-        await session.close()
-        return 1
 
     if final_results:
         final_results.sort(key=lambda x: x["startTime"])
 
     vtlog.info("Updating database...")
     upd_data = {"live": final_results}
+    upd_data2 = {"data": holo_ignored}
     await DatabaseConn.update_data("hololive_data", upd_data)
+    await DatabaseConn.update_data("hololive_ignored", upd_data2)
     await session.close()
 
 
@@ -105,6 +139,9 @@ async def niji_heartbeat(
     vtlog.info("Fetching currently live from Jetri...")
     niji_liveyt, _ = await JetriConn.fetch_lives_niji()
     niji_data: dict = room_dataset["niji"]
+    vtlog.info("Fetching ignored room data from database...")
+    niji_ignored = await DatabaseConn.fetch_data("nijisanji_ignored")
+    niji_ignored: list = niji_ignored["data"]
 
     collect_live_channels = []
     for vt in niji_liveyt:
@@ -122,6 +159,8 @@ async def niji_heartbeat(
             continue
         if room_data["live_status"] != 1:
             continue
+        thumbnail = room_data["user_cover"]
+        viewers = room_data["online"]
         start_time = int(
             round(
                 datetime.strptime(
@@ -131,14 +170,22 @@ async def niji_heartbeat(
         ) - (
             8 * 60 * 60
         )  # Set to UTC
+        gen_id = f"bili{room_id}_{start_time}"
+        if gen_id in niji_ignored:
+            vtlog.warn(
+                f"Ignoring {room_id} since it's an Ignored restream..."
+            )
+            continue
         if str(room_id) in niji_data:
             niji_map = niji_data[str(room_id)]
             if "id" in niji_map and niji_map["id"] in collect_live_channels:
                 vtlog.warn(
                     f"Ignoring {room_id} since it's a YouTube restream..."
                 )
+                if gen_id not in niji_ignored:
+                    niji_ignored.append(gen_id)
                 continue
-        gen_id = f"bili{room_id}_{start_time}"
+        # hls_list, _ = await fetch_room_hls(session, str(room_id))
         dd = {
             "id": gen_id,
             "room_id": int(room_id),
@@ -146,23 +193,18 @@ async def niji_heartbeat(
             "startTime": start_time,
             "channel": str(room_data["uid"]),
             "channel_name": niji_data[str(room_id)]["name"],
+            "thumbnail": thumbnail,
+            "viewers": viewers,
+            "platform": "bilibili",
         }
         final_results.append(dd)
-
-    if not final_results:
-        vtlog.warn("No live currently happening, checking database...")
-        current_lives = await DatabaseConn.fetch_data("nijisanji_data")
-        if current_lives["live"]:
-            vtlog.warn("There's live happening right now, flushing...")
-            await DatabaseConn.update_data("nijisanji_data", {"live": []})
-        vtlog.warn("Bailing!")
-        await session.close()
-        return 1
 
     if final_results:
         final_results.sort(key=lambda x: x["startTime"])
 
     vtlog.info("Updating database...")
     upd_data = {"live": final_results}
+    upd_data2 = {"data": niji_ignored}
     await DatabaseConn.update_data("nijisanji_data", upd_data)
+    await DatabaseConn.update_data("nijisanji_ignored", upd_data2)
     await session.close()
