@@ -1,6 +1,12 @@
 # *-* charset: utf-8 *-*
 # flake8: noqa
 
+from functools import partial
+
+import ujson
+
+udumps = partial(ujson.dumps, ensure_ascii=False, escape_forward_slashes=False)
+
 from .memcache import MemcachedBridge
 
 # Import sanic_motor models

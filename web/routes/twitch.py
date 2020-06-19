@@ -3,7 +3,7 @@ from sanic.log import logger
 from sanic.response import json
 from sanic_openapi import doc
 
-import ujson
+from utils import udumps
 from utils.dbconn import (
     fetch_channels,
     fetch_data,
@@ -36,9 +36,8 @@ async def twitch_live(request):
     twitch_res = await fetch_data("twitchdata", fetch_twitch)
     return json(
         {"live": twitch_res["live"], "cached": True},
-        dumps=ujson.dumps,
-        ensure_ascii=False,
-        escape_forward_slashes=False,
+        dumps=udumps,
+        headers={"Cache-Control": "public, max-age=60, immutable"},
     )
 
 
@@ -61,11 +60,7 @@ async def twitch_chan(request):
     logger.info(f"Requested {request.path} data")
     channel_res = await fetch_channels("ch_twitch", twitch_channels_data)
     return json(
-        {
-            "channels": channel_res["channels"],
-            "cached": True
-        },
-        dumps=ujson.dumps,
-        ensure_ascii=False,
-        escape_forward_slashes=False,
+        {"channels": channel_res["channels"], "cached": True},
+        dumps=udumps,
+        headers={"Cache-Control": "public, max-age=7200, immutable"},
     )

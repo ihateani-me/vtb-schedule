@@ -3,7 +3,7 @@ from sanic.log import logger
 from sanic.response import json
 from sanic_openapi import doc
 
-import ujson
+from utils import udumps
 from utils.dbconn import (
     fetch_data,
     fetch_otheryt,
@@ -41,21 +41,15 @@ async def upcoming_live_other_yt(request):
     current_lives = []
     for channel, channel_data in live_data.items():
         for dataset in channel_data:
-            data = {
-                "id": dataset["id"],
-                "title": dataset["title"],
-                "channel": channel,
-                "startTime": dataset["startTime"],
-            }
+            dataset["channel"] = channel
             if dataset["status"] == "upcoming":
-                upcoming_data.append(data)
+                upcoming_data.append(dataset)
             elif dataset["status"] == "live":
-                current_lives.append(data)
+                current_lives.append(dataset)
     return json(
         {"live": current_lives, "upcoming": upcoming_data, "cached": True},
-        dumps=ujson.dumps,
-        ensure_ascii=False,
-        escape_forward_slashes=False,
+        dumps=udumps,
+        headers={"Cache-Control": "public, max-age=60, immutable"},
     )
 
 
@@ -85,11 +79,7 @@ async def channels_other_yt(request):
     logger.info(f"Requested {request.path} data")
     channel_res = await fetch_channels("ch_otheryt", otheryt_channels_data)
     return json(
-        {
-            "channels": channel_res["channels"],
-            "cached": True
-        },
-        dumps=ujson.dumps,
-        ensure_ascii=False,
-        escape_forward_slashes=False,
+        {"channels": channel_res["channels"], "cached": True},
+        dumps=udumps,
+        headers={"Cache-Control": "public, max-age=7200, immutable"},
     )
