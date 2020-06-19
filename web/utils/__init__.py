@@ -25,9 +25,6 @@ from .models import (
     YouTubeScheduleModel,
 )
 
-# Import all json dataset
-from .dataset import *
-
 from .dbconn import (
     fetch_channels,
     fetch_data,
