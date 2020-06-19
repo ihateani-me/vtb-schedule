@@ -1,4 +1,6 @@
 __pycache__
 _personal
+.vscode
+.mypy_cache
 
 *.log
