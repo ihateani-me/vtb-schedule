@@ -99,6 +99,7 @@ async def fetch_bili_calendar():
                 "startTime": program["start_time"],
                 "channel": str(program["ruid"]),
                 "channel_name": ch_name,
+                "platform": "bilibili",
             }
             final_dataset.append(m_)
     vtlog.info("Final sorting and caching...")

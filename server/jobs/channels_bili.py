@@ -61,6 +61,7 @@ async def main_process_loop(channels_uids):
                     "viewCount": channel_data["archiveView"],
                     "videoCount": channel_data["video"],
                     "live": True if channel_data["liveStatus"] != 0 else False,
+                    "platform": "bilibili",
                     "nsort": nsort,
                 }
             )
@@ -82,6 +83,7 @@ async def main_process_loop(channels_uids):
                     "viewCount": channel_data["archiveView"],
                     "videoCount": channel_data["video"],
                     "live": True if channel_data["liveStatus"] != 0 else False,
+                    "platform": "bilibili",
                     "nsort": nsort,
                 }
             )
@@ -97,6 +99,7 @@ async def main_process_loop(channels_uids):
                     "viewCount": channel_data["archiveView"],
                     "videoCount": channel_data["video"],
                     "live": True if channel_data["liveStatus"] != 0 else False,
+                    "platform": "bilibili",
                     "nsort": nsort,
                 }
             )
