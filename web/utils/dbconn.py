@@ -2,7 +2,6 @@ from aiocache import Cache, cached
 from aiocache.serializers import JsonSerializer
 from sanic.log import logger
 
-from .dataset import OTHER_YT_DATASET
 from .models import (
     HoloBiliDB,
     NijiBiliDB,
@@ -17,7 +16,7 @@ from .models import (
 @cached(
     key="holobili", ttl=60, serializer=JsonSerializer(),
 )
-async def fetch_holobili():
+async def fetch_holobili() -> dict:
     try:
         logger.debug("Fetching (HoloLive) database...")
         data = await HoloBiliDB.find_one()
@@ -26,21 +25,13 @@ async def fetch_holobili():
         logger.debug("Failed to fetch database, returning...")
         return {"upcoming": [], "live": []}
     logger.info("Returning...")
-    upcoming_data = []
-    live_data = []
-    for upcome in data["upcoming"]:
-        upcome["webtype"] = "bilibili"
-        upcoming_data.append(upcome)
-    for livers in data["live"]:
-        livers["webtype"] = "bilibili"
-        live_data.append(livers)
-    return {"upcoming": upcoming_data, "live": live_data}
+    return {"live": data["live"], "upcoming": data["upcoming"]}
 
 
 @cached(
     key="nijibili", ttl=60, serializer=JsonSerializer(),
 )
-async def fetch_nijibili():
+async def fetch_nijibili() -> dict:
     try:
         logger.debug("Fetching (Nijisanji) database...")
         data = await NijiBiliDB.find_one()
@@ -49,21 +40,13 @@ async def fetch_nijibili():
         logger.debug("Failed to fetch database, returning...")
         return {"upcoming": [], "live": []}
     logger.info("Returning...")
-    upcoming_data = []
-    live_data = []
-    for upcome in data["upcoming"]:
-        upcome["webtype"] = "bilibili"
-        upcoming_data.append(upcome)
-    for livers in data["live"]:
-        livers["webtype"] = "bilibili"
-        live_data.append(livers)
-    return {"upcoming": upcoming_data, "live": live_data}
+    return {"live": data["live"], "upcoming": data["upcoming"]}
 
 
 @cached(
     key="otherbili", ttl=60, serializer=JsonSerializer(),
 )
-async def fetch_otherbili():
+async def fetch_otherbili() -> dict:
     try:
         logger.debug("Fetching (Other) database...")
         data = await OtherBiliDB.find_one()
@@ -72,17 +55,13 @@ async def fetch_otherbili():
         logger.debug("Failed to fetch database, returning...")
         return {"upcoming": []}
     logger.info("Returning...")
-    upcoming_data = []
-    for upcome in data["upcoming"]:
-        upcome["webtype"] = "bilibili"
-        upcoming_data.append(upcome)
-    return {"upcoming": upcoming_data}
+    return {"upcoming": data["upcoming"]}
 
 
 @cached(
     key="otheryt", ttl=60, serializer=JsonSerializer(),
 )
-async def fetch_otheryt():
+async def fetch_otheryt() -> dict:
     try:
         logger.debug("Fetching (Other) YT database...")
         data = await OtherYTDB.find_one({}, as_raw=True)
@@ -102,7 +81,7 @@ async def fetch_otheryt():
 @cached(
     key="twitchdata", ttl=60, serializer=JsonSerializer(),
 )
-async def fetch_twitch():
+async def fetch_twitch() -> dict:
     try:
         logger.debug("Fetching Twitch database...")
         data = await TwitchDB.find_one()
@@ -111,17 +90,13 @@ async def fetch_twitch():
         logger.debug("Failed to fetch database, returning...")
         return {"live": []}
     logger.info("Returning...")
-    live_data = []
-    for upcome in data["live"]:
-        upcome["webtype"] = "twitch"
-        live_data.append(upcome)
-    return {"live": live_data}
+    return {"live": data["live"]}
 
 
 @cached(
     key="twitcastdata", ttl=60, serializer=JsonSerializer(),
 )
-async def fetch_twitcasting():
+async def fetch_twitcasting() -> dict:
     try:
         logger.debug("Fetching Twitcasting database...")
         data = await TwitcastingDB.find_one()
@@ -130,17 +105,11 @@ async def fetch_twitcasting():
         logger.debug("Failed to fetch database, returning...")
         return {"live": []}
     logger.info("Returning...")
-    live_data = []
-    for upcome in data["live"]:
-        upcome["webtype"] = "twitcasting"
-        live_data.append(upcome)
-    return {"live": live_data}
+    return {"live": data["live"]}
 
 
-@cached(
-    key="ch_holo", ttl=7200, serializer=JsonSerializer()
-)
-async def hololive_channels_data():
+@cached(key="ch_holo", ttl=7200, serializer=JsonSerializer())
+async def hololive_channels_data() -> dict:
     try:
         logger.debug("Fetching (HoloLive) database...")
         data = await HoloBiliDB.find_one()
@@ -152,10 +121,8 @@ async def hololive_channels_data():
     return {"channels": data["channels"]}
 
 
-@cached(
-    key="ch_niji", ttl=7200, serializer=JsonSerializer()
-)
-async def nijisanji_channels_data():
+@cached(key="ch_niji", ttl=7200, serializer=JsonSerializer())
+async def nijisanji_channels_data() -> dict:
     try:
         logger.debug("Fetching (Nijisanji) database...")
         data = await NijiBiliDB.find_one()
@@ -167,10 +134,8 @@ async def nijisanji_channels_data():
     return {"channels": data["channels"]}
 
 
-@cached(
-    key="ch_otherbili", ttl=7200, serializer=JsonSerializer()
-)
-async def otherbili_channels_data():
+@cached(key="ch_otherbili", ttl=7200, serializer=JsonSerializer())
+async def otherbili_channels_data() -> dict:
     try:
         logger.debug("Fetching (OtherBili) database...")
         data = await OtherBiliDB.find_one()
@@ -185,7 +150,7 @@ async def otherbili_channels_data():
 @cached(
     key="ch_otheryt", ttl=7200, serializer=JsonSerializer(),
 )
-async def otheryt_channels_data():
+async def otheryt_channels_data() -> dict:
     try:
         logger.debug("Fetching (YT Channels) database...")
         data = await OtherYTChannelsDB.find_one()
@@ -200,7 +165,7 @@ async def otheryt_channels_data():
 @cached(
     key="ch_twitcast", ttl=7200, serializer=JsonSerializer(),
 )
-async def twitcast_channels_data():
+async def twitcast_channels_data() -> dict:
     try:
         logger.debug("Fetching (Twitcasting) database...")
         data = await TwitcastingDB.find_one()
@@ -215,7 +180,7 @@ async def twitcast_channels_data():
 @cached(
     key="ch_twitch", ttl=7200, serializer=JsonSerializer(),
 )
-async def twitch_channels_data():
+async def twitch_channels_data() -> dict:
     try:
         logger.debug("Fetching (Twitch) database...")
         data = await TwitchDB.find_one()
@@ -230,7 +195,9 @@ async def twitch_channels_data():
 cache = Cache(serializer=JsonSerializer())
 
 
-async def fetch_data(keyname: str, fallback_func, recache=False):
+async def fetch_data(
+    keyname: str, fallback_func, recache: bool = False
+) -> dict:
     logger.debug("Trying to fetch data...")
     if recache:
         logger.debug("Recaching data as requested by user...")
@@ -248,7 +215,7 @@ async def fetch_data(keyname: str, fallback_func, recache=False):
     return data
 
 
-async def fetch_channels(keyname: str, fallback_func):
+async def fetch_channels(keyname: str, fallback_func) -> dict:
     logger.debug("Trying to fetch channels data...")
     try:
         data = await cache.get(keyname)
@@ -262,7 +229,7 @@ async def fetch_channels(keyname: str, fallback_func):
     return data
 
 
-async def parse_uuids_args(args, fetched_results):
+async def parse_uuids_args(args: dict, fetched_results: dict) -> dict:
     if not args:
         return fetched_results
     uids = args.get("uids", "")
