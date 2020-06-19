@@ -27,17 +27,18 @@ app.blueprint(swagger_blueprint)
 settings = dict(
     MOTOR_URI="mongodb://127.0.0.1:12345/DATABASE_NAME",  # Modify this.
     # Don't modify anything below here
-    API_VERSION="0.6.0",
+    API_VERSION="0.6.2",
+    # API_SCHEMES=["https"],
     API_TITLE="VTubers BiliBili Schedule API",
     API_CONTACT_EMAIL="noaione0809@gmail.com",
     API_LICENSE_NAME="MIT License",
     API_LICENSE_URL="https://github.com/noaione/vthell/blob/master/LICENSE",
 )
 
-API_DESC = """A VTubers **API endpoint** for
+API_DESC = r"""A VTubers **API endpoint** for
 the new [BiliBili scheduling system](https://live.bilibili.com/p/html/live-web-calendar).
 
-This API are updating automatically using cronjob:
+This API are updating automatically via Python appscheduler:
 \- **Every 1 minute** for YouTube/Twitch/Twitcasting Live Streams data.
 \- **Every 2 minutes** for YouTube Upcoming Streams data.
 \- **Every 2 minutes** for BiliBili Live Streams data.
@@ -98,8 +99,15 @@ Refresh/Cache Rate:<br>
 Backend:<br>
 """  # noqa: W605,E501
 EXTENSION_HOMEPAGE = """- Framework: Sanic v{sv} (Python {pyv})<br>
-- Database: MongoDB Community v4.2.3</code>
+- Database: MongoDB Community v4.2.3
 """  # noqa: W605,E501
+SOURCECODE = """
+<br><br>
+&lt;/&gt; Source Code: <a href="https://github.com/noaione/vtb-schedule">GitHub</a> &lt;/&gt;
+<br>
+&lt;/&gt; Deployed API v{appver} &lt;/&gt;
+</code>
+"""  # noqa: E501
 SCRIPTS_HOMEPAGE = r"""<script>
     const clock = document.getElementById("current_dt");
     clock.textContent = (new Date()).toString();
@@ -128,6 +136,10 @@ async def before_response(request, response):
         "API_VERSION", "UNKNOWN"
     )
     response.headers["x-xss-protection"] = "1; mode=block"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers[
+        "Access-Control-Allow-Methods"
+    ] = "POST, GET, OPTIONS, HEAD"  # noqa: E501
 
 
 app.blueprint(holobp)
@@ -142,10 +154,12 @@ app.blueprint(twitchbp)
 @doc.exclude(True)
 async def home(request):
     pyver = "{0.major}.{0.minor}.{0.micro}".format(sys.version_info)
+    app_ver = request.app.config["API_VERSION"]
     html_text = (
         DEFAULT_HOMEPAGE
         + EXTENSION_HOMEPAGE.format(sv=sanicver, pyv=pyver)
         + SCRIPTS_HOMEPAGE
+        + SOURCECODE.format(appver=app_ver)
     )
     return html(html_text)
 
