@@ -37,7 +37,9 @@ class VTBiliDatabase:
     async def insert_new(self, coll_key: str, data: dict) -> bool:
         coll: AsyncIOMotorCollection = self._vtdb[coll_key]
         self.logger.info(f"\tCreating new data for: {coll_key}")
+        await self.acquire()
         result = await coll.insert_one(data)
+        await self.release()
         if result.acknowledged:
             self.logger.info(f"\tInserted with IDs: {result.inserted_id}")
             return True
@@ -60,8 +62,8 @@ class VTBiliDatabase:
     async def fetch_data(self, key: str) -> dict:
         coll: AsyncIOMotorCollection = self._vtdb[key]
         self.logger.info("\tFetching data...")
-        await self.acquire()
         cur: AsyncIOMotorCursor = coll.find({})
+        await self.acquire()
         data = list(await cur.to_list(length=100))
         await self.release()
         return data[0]
