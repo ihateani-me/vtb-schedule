@@ -1,8 +1,6 @@
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from web.utils.dataset import OTHER_YT_DATASET
-
 """Run this script ONLY ONCE"""
 
 MONGODB_URL = "mongodb://127.0.0.1:12345/"
@@ -18,76 +16,79 @@ async def initialize_vtbili():
 
     print("|= Initializing Main Data")
     print("|--> HoloLive")
-    holo_coll = dbconn["live_data"]
-    result = await holo_coll.insert_one({"live": [], "upcoming": []})
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
-    print("|-- $ Success")
-
-    print("|--> Nijisanji")
-    niji_coll = dbconn["live_niji_data"]
-    result = await niji_coll.insert_one({"live": [], "upcoming": []})
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
-    print("|-- $ Success")
-
-    print("|--> Other VTubers")
-    other_coll = dbconn["live_other_data"]
-    result = await other_coll.insert_one({"upcoming": []})
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
-    print("|-- $ Success")
-
-    print("|= Initializing Channels Data")
-    chan_coll = dbconn["channel_data"]
-    result = await chan_coll.insert_one(
-        {
-            "hololive": [],
-            "nijisanji": [],
-            "other": [],
-            "twitch": [],
-            "twitcasting": [],
-            "cached": False,
-        }
+    holo_coll = dbconn["hololive_data"]
+    result = await holo_coll.insert_one(
+        {"live": [], "upcoming": [], "channels": []}
     )
     if not result.acknowledged:
         print("|-- ** Failed to insert, please retry again later **")
         return 1
     print("|-- $ Success")
 
-    print("|= Initializing Other VTubers (YouTube/Twitch) Data")
+    print("|--> Nijisanji")
+    niji_coll = dbconn["nijisanji_data"]
+    result = await niji_coll.insert_one(
+        {"live": [], "upcoming": [], "channels": []}
+    )
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
+    print("|--> Other VTubers")
+    other_coll = dbconn["otherbili_data"]
+    result = await other_coll.insert_one({"upcoming": [], "channels": []})
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
+    print("|= Initializing Other VTubers (YouTube) Data")
     print("|--> Fetched IDs")
-    ytvid_coll = dbconn["yt_other_videoids"]
-    result = await ytvid_coll.insert_one({"ids": []})
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
-    print("|-- $ Success")
-
-    ALL_IDS = {vt["id"]: [] for vt in OTHER_YT_DATASET}
-
-    print("|--> Live Data")
-    ytvid_coll = dbconn["yt_other_livedata"]
-    result = await ytvid_coll.insert_one(ALL_IDS)
-    if not result.acknowledged:
-        print("|-- ** Failed to insert, please retry again later **")
-        return 1
+    await dbconn.create_collection("yt_other_videoids")
     print("|-- $ Success")
 
     print("|--> Live Data")
-    twitch_coll = dbconn["other_twitch_live"]
-    result = await twitch_coll.insert_one({"live": []})
+    await dbconn.create_collection("yt_other_livedata")
+    print("|-- $ Success")
+
+    print("|--> Channels Data")
+    ytchan_coll = dbconn["yt_other_channels"]
+    result = await ytchan_coll.insert_one({"channels": []})
     if not result.acknowledged:
         print("|-- ** Failed to insert, please retry again later **")
         return 1
     print("|-- $ Success")
 
-    print("|= Initializing Twitcasting Data")
+    print("|= Initializing Twitcasting/Twitch Data")
+    print("|--> Twitch")
+    twitch_coll = dbconn["twitch_data"]
+    result = await twitch_coll.insert_one({"live": [], "channels": []})
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
+    print("|--> Twitch")
     twcast_coll = dbconn["twitcasting_data"]
-    result = await twcast_coll.insert_one({"live": []})
+    result = await twcast_coll.insert_one({"live": [], "channels": []})
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
+    print("|= Initializing Ignored BiliBili Data")
+    print("|--> HoloLive")
+    holo_coll = dbconn["hololive_ignored"]
+    result = await holo_coll.insert_one({"data": []})
+    if not result.acknowledged:
+        print("|-- ** Failed to insert, please retry again later **")
+        return 1
+    print("|-- $ Success")
+
+    print("|--> Nijisanji")
+    niji_coll = dbconn["nijisanji_ignored"]
+    result = await niji_coll.insert_one({"data": []})
     if not result.acknowledged:
         print("|-- ** Failed to insert, please retry again later **")
         return 1
