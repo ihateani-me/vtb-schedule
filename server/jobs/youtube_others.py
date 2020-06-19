@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from datetime import datetime, timezone
+from typing import Any, Tuple
 
 import aiohttp
 import feedparser
@@ -11,7 +12,7 @@ import ujson
 
 async def fetch_xmls(
     session: aiohttp.ClientSession, channel: str, nn: int
-) -> dict:
+) -> Tuple[Any, str, int]:
     parameter = {"channel_id": channel}
     async with session.get(
         "https://www.youtube.com/feeds/videos.xml", params=parameter
@@ -22,7 +23,7 @@ async def fetch_xmls(
 
 async def fetch_apis(
     session: aiohttp.ClientSession, endpoint: str, param: dict, channel: str
-) -> tuple:
+) -> Tuple[dict, str]:
     async with session.get(
         f"https://www.googleapis.com/youtube/v3/{endpoint}", params=param
     ) as res:
@@ -34,7 +35,9 @@ async def youtube_video_feeds(
     DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: RotatingAPIKey
 ):
     vtlog = logging.getLogger("yt_videos_feeds")
-    sessions = aiohttp.ClientSession(headers={"User-Agent": "VTBSchedule/0.6.1"})
+    sessions = aiohttp.ClientSession(
+        headers={"User-Agent": "VTBSchedule/0.6.2"}
+    )
 
     vtlog.debug("Opening dataset")
     with open(dataset, "r", encoding="utf-8") as fp:
@@ -135,12 +138,15 @@ async def youtube_video_feeds(
             start_time_ts = int(
                 round(dts.replace(tzinfo=timezone.utc).timestamp())
             )
+            thumbs = f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg"
 
             dd_hell = {
                 "id": video_id,
                 "title": title,
                 "status": broadcast_cnt,
                 "startTime": start_time_ts,
+                "thumbnail": thumbs,
+                "platform": "youtube",
             }
 
             youtube_videos_data.append(dd_hell)
@@ -159,7 +165,9 @@ async def youtube_live_heartbeat(
     DatabaseConn: VTBiliDatabase, yt_api_key: RotatingAPIKey
 ):
     vtlog = logging.getLogger("yt_live_heartbeat")
-    session = aiohttp.ClientSession(headers={"User-Agent": "VTBSchedule/0.6.1"})
+    session = aiohttp.ClientSession(
+        headers={"User-Agent": "VTBSchedule/0.6.2"}
+    )
 
     vtlog.info("Fetching live data...")
 
@@ -209,6 +217,7 @@ async def youtube_live_heartbeat(
         except ValueError:
             strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
         start_t = int(round(strt.replace(tzinfo=timezone.utc).timestamp()))
+        thumbs = f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg"
         vtlog.info(f"|--> Update status for {video_id}: {status_live}")
         new_streams_data = []
         for data_streams in youtube_lives_data[channel_id]:
@@ -220,6 +229,8 @@ async def youtube_live_heartbeat(
                             "title": snippets["title"],
                             "status": status_live,
                             "startTime": start_t,
+                            "thumbnail": thumbs,
+                            "platform": "youtube",
                         }
                     )
             else:
@@ -247,7 +258,9 @@ async def youtube_channels(
     DatabaseConn: VTBiliDatabase, dataset: str, yt_api_key: RotatingAPIKey
 ):
     vtlog = logging.getLogger("yt_channels")
-    sessions = aiohttp.ClientSession(headers={"User-Agent": "VTBSchedule/0.6.1"})
+    sessions = aiohttp.ClientSession(
+        headers={"User-Agent": "VTBSchedule/0.6.2"}
+    )
 
     vtlog.debug("Opening dataset")
     with open(dataset, "r", encoding="utf-8") as fp:
@@ -320,6 +333,7 @@ async def youtube_channels(
             "subscriberCount": subscount,
             "viewCount": viewcount,
             "videoCount": vidcount,
+            "platform": "youtube",
         }
 
         final_channels_dataset.append(data)
