@@ -20,7 +20,7 @@ class TwitchHelix:
         self._cid = client_id
         self._csc = client_secret
         self._sess = aiohttp.ClientSession(
-            headers={"User-Agent": "VTBSchedule/0.6.1"}, loop=loop
+            headers={"User-Agent": "VTBSchedule/0.6.2"}, loop=loop
         )
         self._authorized = False
 
