@@ -13,7 +13,7 @@ class Jetri:
         if not loop:
             loop = asyncio.get_event_loop()
         self._sess = aiohttp.ClientSession(
-            headers={"User-Agent": "VTBSchedule/0.6.1"}, loop=loop
+            headers={"User-Agent": "VTBSchedule/0.6.2"}, loop=loop
         )
 
     async def close(self):
@@ -41,7 +41,7 @@ class Jetri:
         return results
 
     async def fetch_lives(self):
-        live_data = await self._request_jet("live")
+        live_data = await self._request_jet("live/1.1")
         lives, upcomings = (
             live_data["live"],
             self.__filter_upcoming(live_data["upcoming"]),
