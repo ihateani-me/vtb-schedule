@@ -3,17 +3,6 @@ from datetime import datetime, timezone
 
 from .utils import TwitchHelix, VTBiliDatabase
 
-TWITCH_USERNAMES = [
-    "artia_hololive",
-    "kanae_2434",
-    "hiirosss",
-    "MoarinVtuber",
-    "kochou_momiji",
-    "ShibuyaHAL",
-    "SilverStarVT",
-    "pakichi",
-]
-
 
 async def find_channel_id(user_id: str, dataset: list):
     for data in dataset:
@@ -22,11 +11,12 @@ async def find_channel_id(user_id: str, dataset: list):
 
 
 async def twitch_channels(
-    DatabaseConn: VTBiliDatabase, TwitchConn: TwitchHelix
+    DatabaseConn: VTBiliDatabase, TwitchConn: TwitchHelix, twitch_dataset: list
 ):
     vtlog = logging.getLogger("twitch_channels")
+    twitch_usernames = [user["id"] for user in twitch_dataset]
     vtlog.info("Fetching Twitch API...")
-    twitch_results = await TwitchConn.fetch_channels(TWITCH_USERNAMES)
+    twitch_results = await TwitchConn.fetch_channels(twitch_usernames)
 
     vtlog.info("Parsing results...")
     channels_data = []
@@ -43,6 +33,7 @@ async def twitch_channels(
             "thumbnail": result["profile_image_url"],
             "followerCount": followers_data["total"],
             "viewCount": result["view_count"],
+            "platform": "twitch",
         }
 
         channels_data.append(data)
@@ -68,10 +59,9 @@ async def twitch_heartbeat(
     vtlog.info("Parsing results...")
     lives_data = []
     for result in twitch_results:
-        if "type" in result:
-            if result["type"] == "":
-                vtlog.warn(f"|= Skipping: {result['user_id']}")
-                continue
+        if "type" in result and result["type"] == "":
+            vtlog.warn(f"|= Skipping: {result['user_id']}")
+            continue
         start_time = result["started_at"]
 
         login_name = await find_channel_id(result["user_id"], twitch_dataset)
@@ -80,7 +70,7 @@ async def twitch_heartbeat(
         thumbnail = result["thumbnail_url"]
         try:
             thumbnail = thumbnail.format(width="1280", height="720")
-        except:
+        except KeyError:
             pass
 
         start_utc = (
@@ -96,9 +86,12 @@ async def twitch_heartbeat(
             "channel": login_name,
             "channel_id": result["user_id"],
             "thumbnail": thumbnail,
-            "webtype": "twitch",
+            "platform": "twitch",
         }
         lives_data.append(data)
+
+    if lives_data:
+        lives_data.sort(key=lambda x: x["startTime"])
 
     upd_data = {"live": lives_data}
     vtlog.info("Updating database...")
