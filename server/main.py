@@ -4,25 +4,46 @@ import logging
 import os
 import sys
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+if not sys.version_info.major == 3 and sys.version_info.minor >= 6:
+    print("Python 3.6 or higher are required to run this app.")
+    print("You are using Python {}.{}".format(
+        sys.version_info.major, sys.version_info.minor)
+    )
+    sys.exit(1)
 
-import ujson
-from jobs import (
-    holo_heartbeat,
-    hololive_main,
-    niji_heartbeat,
-    nijisanji_main,
-    others_main,
-    twitcasting_channels,
-    twitcasting_heartbeat,
-    twitch_channels,
-    twitch_heartbeat,
-    update_channels_stats,
-    youtube_channels,
-    youtube_live_heartbeat,
-    youtube_video_feeds,
-)
-from jobs.utils import Jetri, RotatingAPIKey, TwitchHelix, VTBiliDatabase
+try:
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+except ImportError:
+    print(
+        "Please install \"appscheduler\" to continue"
+        "\npip install appscheduler"
+    )
+    sys.exit(1)
+
+try:
+    import ujson
+    from jobs import (
+        holo_heartbeat,
+        hololive_main,
+        niji_heartbeat,
+        nijisanji_main,
+        others_main,
+        twitcasting_channels,
+        twitcasting_heartbeat,
+        twitch_channels,
+        twitch_heartbeat,
+        update_channels_stats,
+        youtube_channels,
+        youtube_live_heartbeat,
+        youtube_video_feeds,
+    )
+    from jobs.utils import Jetri, RotatingAPIKey, TwitchHelix, VTBiliDatabase
+except ImportError as ie:
+    print("Missing one or more requirements!")
+    traced = str(ie)
+    mod_name = traced[traced.find("\'")+1:traced.rfind("\'")]
+    print("Please install this module: \"{}\"".format(mod_name))
+    sys.exit(1)
 
 BASE_FOLDER_PATH = "./"  # Modify this
 
@@ -32,7 +53,7 @@ MONGODB_DBNAME = "vtbili"  # Modify this
 # Modify this
 # You can add more and more API keys if you want.
 YT_API_KEYS = [
-    ""
+    "",
 ]
 # Used to rotate between multiple YT API Keys (If you have multiple API keys)
 API_KEY_ROTATION_RATE = 60  # In minutes
@@ -55,6 +76,9 @@ INTERVAL_TWITCASTING_LIVE = 1  # In minutes
 
 INTERVAL_TWITCH_LIVE = 1  # In minutes
 INTERVAL_TWITCH_CHANNELS = 6 * 60  # In minutes
+
+SKIP_CHANNELS_FIRST_RUN = True
+SKIP_EVERY_FIRST_RUN = False
 
 
 if __name__ == "__main__":
@@ -219,7 +243,6 @@ if __name__ == "__main__":
     )
 
     if isinstance(tw_helix, TwitchHelix):
-
         twch_file = os.path.join(
             BASE_FOLDER_PATH, "dataset", "_twitchdata_other.json"
         )
@@ -240,24 +263,23 @@ if __name__ == "__main__":
         scheduler.add_job(
             twitch_channels,
             "interval",
-            kwargs={"DatabaseConn": vtbili_db, "TwitchConn": tw_helix},
+            kwargs={
+                "DatabaseConn": vtbili_db,
+                "TwitchConn": tw_helix,
+                "twitch_dataset": twch_mapping,
+            },
             minutes=INTERVAL_TWITCH_CHANNELS,
         )
 
-    vtlog.info("Doing first run!")
     jobs_data = [
         asyncio.ensure_future(hololive_main(vtbili_db)),
         asyncio.ensure_future(nijisanji_main(vtbili_db)),
         asyncio.ensure_future(others_main(vtbili_db, others_dataset)),
-        asyncio.ensure_future(update_channels_stats(vtbili_db, dataset_all)),
         asyncio.ensure_future(
             youtube_live_heartbeat(vtbili_db, yt_api_rotate)
         ),
         asyncio.ensure_future(
             youtube_video_feeds(vtbili_db, others_yt_dataset, yt_api_rotate)
-        ),
-        asyncio.ensure_future(
-            youtube_channels(vtbili_db, others_yt_dataset, yt_api_rotate)
         ),
         asyncio.ensure_future(
             holo_heartbeat(vtbili_db, jetri_co, ytbili_mapping)
@@ -268,19 +290,42 @@ if __name__ == "__main__":
         asyncio.ensure_future(
             twitcasting_heartbeat(vtbili_db, twcast_mapping)
         ),
-        asyncio.ensure_future(twitcasting_channels(vtbili_db, twcast_mapping)),
     ]
+    if not SKIP_CHANNELS_FIRST_RUN:
+        jobs_data.extend(
+            [
+                asyncio.ensure_future(
+                    update_channels_stats(vtbili_db, dataset_all)
+                ),
+                asyncio.ensure_future(
+                    youtube_channels(
+                        vtbili_db,
+                        others_yt_dataset,
+                        yt_api_rotate
+                    )
+                ),
+                asyncio.ensure_future(
+                    twitcasting_channels(vtbili_db, twcast_mapping)
+                ),
+            ]
+        )
     if isinstance(tw_helix, TwitchHelix):
         jobs_data.extend(
             [
                 asyncio.ensure_future(
                     twitch_heartbeat(vtbili_db, tw_helix, twch_mapping)
                 ),
-                asyncio.ensure_future(twitch_channels(vtbili_db, tw_helix)),
+                asyncio.ensure_future(
+                    twitch_channels(vtbili_db, tw_helix, twch_mapping)
+                ),
             ]
         )
+        if SKIP_CHANNELS_FIRST_RUN:
+            jobs_data.pop(-1)
 
-    loop_de_loop.run_until_complete(asyncio.gather(*jobs_data))
+    if not SKIP_EVERY_FIRST_RUN:
+        vtlog.info("Doing first run!")
+        loop_de_loop.run_until_complete(asyncio.gather(*jobs_data))
     vtlog.info("Starting scheduler!")
     scheduler.start()
 
