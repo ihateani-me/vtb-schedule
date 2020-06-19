@@ -74,6 +74,7 @@ async def twitcasting_channels(
             "followerCount": udata["backerCount"],
             "level": udata["level"],
             "thumbnail": profile_img,
+            "platform": "twitcasting",
         }
         twitcast_chan_data.append(data)
 
@@ -124,6 +125,9 @@ async def twitcasting_heartbeat(
             continue
 
         tw_time_passed = int(tw_list[6])
+        tw_max_viewers = int(tw_list[5])
+        tw_current_viewers = int(tw_list[3])
+
         tw_title = unquote(tw_list[7]).strip()
 
         if tw_title == "":
@@ -136,6 +140,9 @@ async def twitcasting_heartbeat(
             "title": tw_title,
             "startTime": tw_start_time,
             "channel": channel,
+            "viewers": tw_current_viewers,
+            "peakViewers": tw_max_viewers,
+            "platform": "twitcasting",
         }
         twitcasting_live_data.append(dataset)
 
