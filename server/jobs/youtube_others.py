@@ -216,6 +216,13 @@ async def youtube_live_heartbeat(
             strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%S.%fZ")
         except ValueError:
             strt = datetime.strptime(strt, "%Y-%m-%dT%H:%M:%SZ")
+        view_count = None
+        if "concurrentViewers" in livedetails:
+            view_count = livedetails["concurrentViewers"]
+            try:
+                view_count = int(view_count)
+            except ValueError:
+                pass
         start_t = int(round(strt.replace(tzinfo=timezone.utc).timestamp()))
         thumbs = f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg"
         vtlog.info(f"|--> Update status for {video_id}: {status_live}")
@@ -223,16 +230,17 @@ async def youtube_live_heartbeat(
         for data_streams in youtube_lives_data[channel_id]:
             if data_streams["id"] == video_id:
                 if status_live != "delete":
-                    new_streams_data.append(
-                        {
-                            "id": data_streams["id"],
-                            "title": snippets["title"],
-                            "status": status_live,
-                            "startTime": start_t,
-                            "thumbnail": thumbs,
-                            "platform": "youtube",
-                        }
-                    )
+                    append_data = {
+                        "id": data_streams["id"],
+                        "title": snippets["title"],
+                        "status": status_live,
+                        "startTime": start_t,
+                        "thumbnail": thumbs,
+                        "platform": "youtube",
+                    }
+                    if view_count is not None:
+                        append_data["viewers"] = view_count
+                    new_streams_data.append(append_data)
             else:
                 new_streams_data.append(data_streams)
         youtube_lives_data[channel_id] = new_streams_data
