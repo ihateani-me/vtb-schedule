@@ -60,17 +60,6 @@ async def hololiveup_api(request):
     )
 
 
-@holobp.get("/yt/live")
-@doc.route(exclude=True)
-async def holotube_live_api(request):
-    logger.info(f"Requested {request.path} data")
-    return json(
-        {"live": [], "upcoming": [], "past": [], "cached": True, "message": "API deprecated."},
-        dumps=udumps,
-        headers={"Cache-Control": "public, max-age=60, immutable"},
-    )
-
-
 @holobp.get("/channels")
 @doc.summary("HoloPro Vtubers BiliBili Channel Stats")
 @doc.description(
