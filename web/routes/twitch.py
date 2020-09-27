@@ -16,10 +16,10 @@ twitchbp = Blueprint("Twitch", "/twitch", strict_slashes=True)
 
 
 @twitchbp.get("/live")
-@doc.summary("Live Twitch streams")
+@doc.summary("Live Twitch VTubers Streams")
 @doc.description(
-    "Fetch a list of live streams from available Twitch VTubers"
-    ", updated every 1 minutes via cronjob."
+    "Fetch a list of live streams from Twitch VTubers"
+    ", updated every 1 minute."
 )
 @doc.produces(
     {
@@ -32,19 +32,24 @@ twitchbp = Blueprint("Twitch", "/twitch", strict_slashes=True)
     content_type="application/json",
 )
 async def twitch_live(request):
+    on_maintenance = request.app.config["API_MAINTENANCE_MODE"]
     logger.info(f"Requested {request.path} data")
-    twitch_res = await fetch_data("twitchdata", fetch_twitch)
+    if not on_maintenance:
+        twitch_res = await fetch_data("twitchdata", fetch_twitch)
+    else:
+        twitch_res = {"live": []}
     return json(
-        {"live": twitch_res["live"], "cached": True},
+        {"live": twitch_res["live"], "cached": True if not on_maintenance else False},
         dumps=udumps,
         headers={"Cache-Control": "public, max-age=60, immutable"},
     )
 
 
 @twitchbp.get("/channels")
-@doc.summary("Twitch Channel Stats")
+@doc.summary("Twitch VTubers Channel Stats")
 @doc.description(
-    "Fetch a list of channels stats, updated every 6 hours via cronjob."
+    "Fetch a list of VTubers Twitch channels info/statistics"
+    ", updated every 6 hours."
 )
 @doc.produces(
     {
@@ -57,10 +62,13 @@ async def twitch_live(request):
     content_type="application/json",
 )
 async def twitch_chan(request):
+    on_maintenance = request.app.config["API_MAINTENANCE_MODE"]
     logger.info(f"Requested {request.path} data")
-    channel_res = await fetch_channels("ch_twitch", twitch_channels_data)
+    if not on_maintenance:
+        channel_res = await fetch_channels("ch_twitch", twitch_channels_data)
+    else:
+        channel_res = {"channels": []}
     return json(
-        {"channels": channel_res["channels"], "cached": True},
+        {"channels": channel_res["channels"], "cached": True if not on_maintenance else False},
         dumps=udumps,
-        headers={"Cache-Control": "public, max-age=7200, immutable"},
     )

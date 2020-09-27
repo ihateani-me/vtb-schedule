@@ -16,10 +16,10 @@ twitcastbp = Blueprint("Twitcasting", "/twitcasting", strict_slashes=True)
 
 
 @twitcastbp.get("/live")
-@doc.summary("Live Twitcasting streams")
+@doc.summary("Live Twitcasting VTubers Streams")
 @doc.description(
-    "Fetch a list of live streams from available Twitcasting"
-    ", updated every 1 minutes via cronjob."
+    "Fetch a list of live streams from Twitcasting VTubers"
+    ", updated every 1 minute."
 )
 @doc.produces(
     {
@@ -32,19 +32,24 @@ twitcastbp = Blueprint("Twitcasting", "/twitcasting", strict_slashes=True)
     content_type="application/json",
 )
 async def twitcast_live(request):
+    on_maintenance = request.app.config["API_MAINTENANCE_MODE"]
     logger.info(f"Requested {request.path} data")
-    twitcast_res = await fetch_data("twitcastdata", fetch_twitcasting)
+    if not on_maintenance:
+        twitcast_res = await fetch_data("twitcastdata", fetch_twitcasting)
+    else:
+        twitcast_res = {"live": []}
     return json(
-        {"live": twitcast_res["live"], "cached": True},
+        {"live": twitcast_res["live"], "cached": True if not on_maintenance else False},
         dumps=udumps,
         headers={"Cache-Control": "public, max-age=60, immutable"},
     )
 
 
 @twitcastbp.get("/channels")
-@doc.summary("Twitcasting Channel Stats")
+@doc.summary("Twitcasting VTubers Channel Stats")
 @doc.description(
-    "Fetch a list of channels stats, updated every 6 hours via cronjob."
+    "Fetch a list of VTubers Twitcasting channels info/statistics"
+    ", updated every 6 hours."
 )
 @doc.produces(
     {
@@ -57,10 +62,13 @@ async def twitcast_live(request):
     content_type="application/json",
 )
 async def twitcast_chan(request):
+    on_maintenance = request.app.config["API_MAINTENANCE_MODE"]
     logger.info(f"Requested {request.path} data")
-    channel_res = await fetch_channels("ch_twitcast", twitcast_channels_data)
+    if not on_maintenance:
+        channel_res = await fetch_channels("ch_twitcast", twitcast_channels_data)
+    else:
+        channel_res = {"channels": []}
     return json(
-        {"channels": channel_res["channels"], "cached": True},
+        {"channels": channel_res["channels"], "cached": True if not on_maintenance else False},
         dumps=udumps,
-        headers={"Cache-Control": "public, max-age=7200, immutable"},
     )

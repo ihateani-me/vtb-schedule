@@ -17,10 +17,10 @@ holobp = Blueprint("Hololive", "/", strict_slashes=True)
 
 
 @holobp.get("/live")
-@doc.summary("Live/Upcoming HoloLive streams")
+@doc.summary("Live/Upcoming HoloPro BiliBili Streams")
 @doc.description(
-    "Fetch a list of live/upcoming streams from HoloLive VTubers"
-    ", updated every 2/4 minutes via cronjob."
+    "Fetch a list of live/upcoming streams from BiliBili for HoloPro VTubers"
+    ", updated every 2 minutes for live data and 4 minutes for upcoming data."
 )
 @doc.consumes(
     doc.String(
@@ -42,24 +42,40 @@ holobp = Blueprint("Hololive", "/", strict_slashes=True)
     content_type="application/json",
 )
 async def hololiveup_api(request):
+    on_maintenance = request.app.config["API_MAINTENANCE_MODE"]
     logger.info(f"Requested {request.path} data")
-    holo_results = await fetch_data("holobili", fetch_holobili)
+    if not on_maintenance:
+        holo_results = await fetch_data("holobili", fetch_holobili)
+    else:
+        holo_results = {"live": [], "upcoming": []}
     upcoming_results = await parse_uuids_args(request.args, holo_results)
     return json(
         {
             "live": holo_results["live"],
             "upcoming": upcoming_results["upcoming"],
-            "cached": True,
+            "cached": True if not on_maintenance else False,
         },
         dumps=udumps,
         headers={"Cache-Control": "public, max-age=60, immutable"},
     )
 
 
+@holobp.get("/yt/live")
+@doc.route(exclude=True)
+async def holotube_live_api(request):
+    logger.info(f"Requested {request.path} data")
+    return json(
+        {"live": [], "upcoming": [], "past": [], "cached": True, "message": "API deprecated."},
+        dumps=udumps,
+        headers={"Cache-Control": "public, max-age=60, immutable"},
+    )
+
+
 @holobp.get("/channels")
-@doc.summary("HoloLivers Channel Stats")
+@doc.summary("HoloPro Vtubers BiliBili Channel Stats")
 @doc.description(
-    "Fetch a list of channels stats, updated every 6 hours via cronjob."
+    "Fetch a list of HoloPro VTubers BiliBili channels info/statistics"
+    ", updated every 6 hours."
 )
 @doc.produces(
     {
@@ -72,10 +88,13 @@ async def hololiveup_api(request):
     content_type="application/json",
 )
 async def holochan_api(request):
+    on_maintenance = request.app.config["API_MAINTENANCE_MODE"]
     logger.info(f"Requested {request.path} data")
-    channel_res = await fetch_channels("ch_holo", hololive_channels_data)
+    if not on_maintenance:
+        channel_res = await fetch_channels("ch_holo", hololive_channels_data)
+    else:
+        channel_res = {"channels": []}
     return json(
-        {"channels": channel_res["channels"], "cached": True},
+        {"channels": channel_res["channels"], "cached": True if not on_maintenance else False},
         dumps=udumps,
-        headers={"Cache-Control": "public, max-age=7200, immutable"},
     )
