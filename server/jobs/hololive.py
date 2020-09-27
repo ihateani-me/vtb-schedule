@@ -1,11 +1,12 @@
+import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import aiohttp
-import pytz
-from .utils import VTBiliDatabase
 
-vtlog = logging.getLogger("hololive")
+from utils import VTBiliDatabase
+
+vtlog = logging.getLogger("jobs.hololive")
 
 HOLO_BILI_UIDS = [
     "389056211",
@@ -46,6 +47,7 @@ HOLO_BILI_UIDS = [
     "551114700",
     "350631685",
     "551114698",
+    "647375261",
 ]
 
 
@@ -65,7 +67,7 @@ async def requests_data(url, params):
 async def fetch_bili_calendar():
     vtlog.debug(f"Total HoloLive BiliBili IDs: {len(HOLO_BILI_UIDS)}")
     vtubers_uids = ",".join(HOLO_BILI_UIDS)
-    current_dt = datetime.now()
+    current_dt = datetime.now(timezone(timedelta(hours=8)))  # Use GMT+8.
     current_ym = current_dt.strftime("%Y-%m")
     current_d = current_dt.day
 
@@ -85,13 +87,11 @@ async def fetch_bili_calendar():
     final_dataset = []
     for date in date_keys:
         for program in programs_info[str(date)]["program_list"]:
-            current_utc = datetime.now(tz=pytz.timezone("UTC")).timestamp()
+            current_utc = datetime.now(tz=timezone.utc).timestamp()
             if current_utc >= program["start_time"]:
                 continue
             ch_name = users_info[str(program["ruid"])]["uname"]
-            generate_id = (
-                f"bili{program['subscription_id']}_{program['program_id']}"
-            )
+            generate_id = f"bili{program['subscription_id']}_{program['program_id']}"
             m_ = {
                 "id": generate_id,
                 "room_id": program["room_id"],
@@ -114,4 +114,9 @@ async def hololive_main(DatabaseConn: VTBiliDatabase):
 
     vtlog.info("Updating database...")
     upd_data = {"upcoming": calendar_data}
-    await DatabaseConn.update_data("hololive_data", upd_data)
+    try:
+        await asyncio.wait_for(DatabaseConn.update_data("hololive_data", upd_data), 15.0)
+    except asyncio.TimeoutError:
+        await DatabaseConn.release()
+        DatabaseConn.raise_error()
+        vtlog.error("Failed to update upcoming data, timeout by 15s...")

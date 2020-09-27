@@ -1,13 +1,15 @@
+import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
+import aiofiles
 import aiohttp
-import pytz
-from .utils import VTBiliDatabase
+
+from utils import VTBiliDatabase
 
 import ujson
 
-vtlog = logging.getLogger("others")
+vtlog = logging.getLogger("jobs.others")
 
 
 async def requests_data(url, params):
@@ -26,7 +28,7 @@ async def requests_data(url, params):
 async def fetch_bili_calendar(VTBS_UIDS):
     vtlog.debug(f"Total Others BiliBili IDs: {len(VTBS_UIDS)}")
     vtubers_uids = ",".join(VTBS_UIDS)
-    current_dt = datetime.now()
+    current_dt = datetime.now(timezone(timedelta(hours=8)))  # Use GMT+8.
     current_ym = current_dt.strftime("%Y-%m")
     current_d = current_dt.day
 
@@ -46,13 +48,11 @@ async def fetch_bili_calendar(VTBS_UIDS):
     final_dataset = []
     for date in date_keys:
         for program in programs_info[str(date)]["program_list"]:
-            current_utc = datetime.now(tz=pytz.timezone("UTC")).timestamp()
+            current_utc = datetime.now(tz=timezone.utc).timestamp()
             if current_utc >= program["start_time"]:
                 continue
             ch_name = users_info[str(program["ruid"])]["uname"]
-            generate_id = (
-                f"bili{program['subscription_id']}_{program['program_id']}"
-            )
+            generate_id = f"bili{program['subscription_id']}_{program['program_id']}"
             m_ = {
                 "id": generate_id,
                 "room_id": program["room_id"],
@@ -70,13 +70,18 @@ async def fetch_bili_calendar(VTBS_UIDS):
 
 
 async def others_main(DatabaseConn: VTBiliDatabase, dataset_path: str):
-    with open(dataset_path, "r", encoding="utf-8") as fp:
-        CHAN_BILIBILI = ujson.load(fp)
+    async with aiofiles.open(dataset_path, "r", encoding="utf-8") as fp:
+        channels_dataset = ujson.loads(await fp.read())
 
-    CHAN_BILI_UIDS = [chan["uid"] for chan in CHAN_BILIBILI]
+    CHAN_BILI_UIDS = [chan["uid"] for chan in channels_dataset]
     vtlog.info("Fetching bili calendar data...")
     calendar_data = await fetch_bili_calendar(CHAN_BILI_UIDS)
 
     vtlog.info("Updating database...")
     upd_data = {"upcoming": calendar_data}
-    await DatabaseConn.update_data("otherbili_data", upd_data)
+    try:
+        await asyncio.wait_for(DatabaseConn.update_data("otherbili_data", upd_data), 15.0)
+    except asyncio.TimeoutError:
+        await DatabaseConn.release()
+        DatabaseConn.raise_error()
+        vtlog.error("Failed to update upcoming data, timeout by 15s...")

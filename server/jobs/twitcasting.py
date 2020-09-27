@@ -6,26 +6,23 @@ from urllib.parse import unquote
 
 import aiohttp
 
-from .utils import VTBiliDatabase
+from utils import VTBiliDatabase
 
 CHROME_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"  # noqa: E501
+vtlog = logging.getLogger("jobs.twitcasting")
 
 
 async def check_status(
     session: aiohttp.ClientSession, param: dict, channel: str
 ) -> Tuple[Union[str, None], str]:
-    async with session.get(
-        "https://twitcasting.tv/streamchecker.php", params=param
-    ) as res:
+    async with session.get("https://twitcasting.tv/streamchecker.php", params=param) as res:
         text_results: Union[str, None] = await res.text()
         if res.status != 200:
             return None, channel
     return text_results, channel
 
 
-async def get_user_data(
-    session: aiohttp.ClientSession, channel: str
-) -> Tuple[Union[dict, None], str]:
+async def get_user_data(session: aiohttp.ClientSession, channel: str) -> Tuple[Union[dict, None], str]:
     uri = f"https://frontendapi.twitcasting.tv/users/{channel}?detail=true"
     async with session.get(uri) as resp:
         json_res: dict = await resp.json()
@@ -34,10 +31,7 @@ async def get_user_data(
     return json_res, channel
 
 
-async def twitcasting_channels(
-    DatabaseConn: VTBiliDatabase, twitcast_data: list
-):
-    vtlog = logging.getLogger("twcast_channels")
+async def twitcasting_channels(DatabaseConn: VTBiliDatabase, twitcast_data: list):
     sessions = aiohttp.ClientSession(headers={"User-Agent": CHROME_UA})
 
     vtlog.info("Collecting IDs...")
@@ -46,15 +40,12 @@ async def twitcasting_channels(
     vtlog.info("Creating tasks...")
     twitcast_tasks = [get_user_data(sessions, uid) for uid in twitcast_id]
 
-    twitcast_chan_data = []
     vtlog.info("Running all tasks...")
     for twit_task in asyncio.as_completed(twitcast_tasks):
         twit_res, channel = await twit_task
         vtlog.info(f"|-- Checking {channel} data...")
         if not twit_res or "user" not in twit_res:
-            vtlog.error(
-                f"|--! Failed to fetch info for {channel}, skipping..."
-            )
+            vtlog.error(f"|--! Failed to fetch info for {channel}, skipping...")
             continue
 
         udata = twit_res["user"]
@@ -76,31 +67,26 @@ async def twitcasting_channels(
             "thumbnail": profile_img,
             "platform": "twitcasting",
         }
-        twitcast_chan_data.append(data)
 
-    if twitcast_chan_data:
-        twitcast_chan_data.sort(key=lambda x: x["id"])
+        vtlog.info(f"Updating channels database for {channel}...")
+        try:
+            await asyncio.wait_for(DatabaseConn.update_data("twitcasting_channels", {channel: data}), 15.0)
+        except asyncio.TimeoutError:
+            await DatabaseConn.release()
+            DatabaseConn.raise_error()
+            vtlog.error("Failed to update twitcasting channels data, timeout by 15s...")
 
-    vtlog.info("Updating database...")
-    upd_data = {"channels": twitcast_chan_data}
-    await DatabaseConn.update_data("twitcasting_data", upd_data)
     await sessions.close()
 
 
-async def twitcasting_heartbeat(
-    DatabaseConn: VTBiliDatabase, twitcast_data: list
-):
-    vtlog = logging.getLogger("twcast_heartbeat")
+async def twitcasting_heartbeat(DatabaseConn: VTBiliDatabase, twitcast_data: list):
     sessions = aiohttp.ClientSession(headers={"User-Agent": CHROME_UA})
 
     vtlog.info("Collecting IDs...")
     twitcast_id = [twit["id"] for twit in twitcast_data]
 
     vtlog.info("Creating tasks...")
-    twitcast_tasks = [
-        check_status(sessions, {"u": uid, "v": 999}, uid)
-        for uid in twitcast_id
-    ]
+    twitcast_tasks = [check_status(sessions, {"u": uid, "v": 999}, uid) for uid in twitcast_id]
 
     tmri = lambda t: int(round(t))  # noqa: E731
 
@@ -111,9 +97,7 @@ async def twitcasting_heartbeat(
         twit_res, channel = await twit_task
         vtlog.info(f"|-- Checking {channel} heartbeat")
         if not twit_res:
-            vtlog.error(
-                f"|--! Failed to fetch info for {channel}, skipping..."
-            )
+            vtlog.error(f"|--! Failed to fetch info for {channel}, skipping...")
             continue
 
         tw_list = twit_res.split("\t")
@@ -151,5 +135,10 @@ async def twitcasting_heartbeat(
 
     vtlog.info("Updating database...")
     upd_data = {"live": twitcasting_live_data}
-    await DatabaseConn.update_data("twitcasting_data", upd_data)
+    try:
+        await asyncio.wait_for(DatabaseConn.update_data("twitcasting_data", upd_data), 15.0)
+    except asyncio.TimeoutError:
+        await DatabaseConn.release()
+        DatabaseConn.raise_error()
+        vtlog.error("Failed to update twitcasting live data, timeout by 15s...")
     await sessions.close()

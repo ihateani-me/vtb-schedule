@@ -1,12 +1,13 @@
 import asyncio
 import logging
 
+import aiofiles
 import aiohttp
-from .utils import VTBiliDatabase
+from utils import VTBiliDatabase
 
 import ujson
 
-vtlog = logging.getLogger("channelsbili")
+vtlog = logging.getLogger("jobs.channels_bili")
 
 
 async def requests_data(url):
@@ -41,9 +42,7 @@ async def main_process_loop(channels_uids):
     nijisanji_vlivers = []
     other_vlivers = []
     vtlog.info("Creating tasks...")
-    fetch_tasks = [
-        find_channel_info(vtbs_api_data, ch) for ch in channels_uids
-    ]
+    fetch_tasks = [find_channel_info(vtbs_api_data, ch) for ch in channels_uids]
     vtlog.info("Running all tasks...")
     for task in asyncio.as_completed(fetch_tasks):
         channel_data, ident, nsort = await task
@@ -65,13 +64,7 @@ async def main_process_loop(channels_uids):
                     "nsort": nsort,
                 }
             )
-        elif ident in (
-            "virtuareal",
-            "nijisanji",
-            "nijisanjikr",
-            "nijisanjiid",
-            "nijisanjiin",
-        ):
+        elif ident in ("virtuareal", "nijisanji", "nijisanjikr", "nijisanjiid", "nijisanjiin",):
             nijisanji_vlivers.append(
                 {
                     "id": str(channel_data["mid"]),
@@ -110,15 +103,9 @@ async def main_process_loop(channels_uids):
     hololivers.sort(key=lambda x: x["nsort"])
     nijisanji_vlivers.sort(key=lambda x: x["nsort"])
     other_vlivers.sort(key=lambda x: x["nsort"])
-    hololivers = [
-        {x: d[x] for x in d if x not in {"nsort"}} for d in hololivers
-    ]
-    nijisanji_vlivers = [
-        {x: d[x] for x in d if x not in {"nsort"}} for d in nijisanji_vlivers
-    ]
-    other_vlivers = [
-        {x: d[x] for x in d if x not in {"nsort"}} for d in other_vlivers
-    ]
+    hololivers = [{x: d[x] for x in d if x not in {"nsort"}} for d in hololivers]
+    nijisanji_vlivers = [{x: d[x] for x in d if x not in {"nsort"}} for d in nijisanji_vlivers]
+    other_vlivers = [{x: d[x] for x in d if x not in {"nsort"}} for d in other_vlivers]
     final_dds_data["hololive"] = hololivers
     final_dds_data["nijisanji"] = nijisanji_vlivers
     final_dds_data["other"] = other_vlivers
@@ -126,15 +113,13 @@ async def main_process_loop(channels_uids):
     return final_dds_data
 
 
-async def update_channels_stats(
-    DatabaseConn: VTBiliDatabase, dataset_set: list
-):
+async def update_channels_stats(DatabaseConn: VTBiliDatabase, dataset_set: list):
     vtlog.info("Collecting channel UUIDs")
     channels_uids = []
     for chan in dataset_set:
         vtlog.debug(f"Opening: {chan}")
-        with open(chan, "r", encoding="utf-8") as fp:
-            dds = ujson.load(fp)
+        async with aiofiles.open(chan, "r", encoding="utf-8") as fp:
+            dds = ujson.loads(await fp.read())
         vtlog.debug(f"Total data: {len(dds)}")
         for nn, dd in enumerate(dds):
             channels_uids.append({"id": dd["id"], "uid": dd["uid"], "num": nn})
@@ -142,14 +127,29 @@ async def update_channels_stats(
     vtlog.info("Processing...")
     final_data = await main_process_loop(channels_uids)
     vtlog.info("Updating DB data for Hololive...")
-    await DatabaseConn.update_data(
-        "hololive_data", {"channels": final_data["hololive"]}
-    )
+    try:
+        await asyncio.wait_for(
+            DatabaseConn.update_data("hololive_data", {"channels": final_data["hololive"]}), 15.0
+        )
+    except asyncio.TimeoutError:
+        await DatabaseConn.release()
+        DatabaseConn.raise_error()
+        vtlog.error("Failed to update Hololive channels data, timeout by 15s...")
     vtlog.info("Updating DB data for Nijisanji...")
-    await DatabaseConn.update_data(
-        "nijisanji_data", {"channels": final_data["nijisanji"]}
-    )
+    try:
+        await asyncio.wait_for(
+            DatabaseConn.update_data("nijisanji_data", {"channels": final_data["nijisanji"]}), 15.0
+        )
+    except asyncio.TimeoutError:
+        await DatabaseConn.release()
+        DatabaseConn.raise_error()
+        vtlog.error("Failed to update Nijisanji channels data, timeout by 15s...")
     vtlog.info("Updating DB data for Others...")
-    await DatabaseConn.update_data(
-        "otherbili_data", {"channels": final_data["other"]}
-    )
+    try:
+        await asyncio.wait_for(
+            DatabaseConn.update_data("otherbili_data", {"channels": final_data["other"]}), 15.0
+        )
+    except asyncio.TimeoutError:
+        await DatabaseConn.release()
+        DatabaseConn.raise_error()
+        vtlog.error("Failed to update Others channels data, timeout by 15s...")
