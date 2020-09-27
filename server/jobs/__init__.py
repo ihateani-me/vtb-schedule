@@ -12,3 +12,5 @@ from .youtube_others import (
     youtube_live_heartbeat,
     youtube_video_feeds,
 )
+from .nijitube_channels import nijitube_channels_data
+from .nijitube_live import nijitube_live_heartbeat, nijitube_video_feeds
