@@ -1,77 +1,87 @@
 [
     {
-        "id":"UCevD0wKzJFpfIkvHOiQsfLQ",
-        "name":"Nekomiya Hinata",
-        "affiliates":"entum"
+        "id": "UCevD0wKzJFpfIkvHOiQsfLQ",
+        "name": "Nekomiya Hinata",
+        "affiliates": "entum"
     },
     {
-        "id":"UCfuz6xYbYFGsWWBi3SpJI1w",
-        "name":"Kano",
-        "affiliates":"hanayori"
+        "id": "UCfuz6xYbYFGsWWBi3SpJI1w",
+        "name": "Kano",
+        "affiliates": "hanayori"
     },
     {
-        "id":"UC8NZiqKx6fsDT3AVcMiVFyA",
-        "name":"Inuyama Tamaki",
-        "affiliates":"noripro"
+        "id": "UCV2m2UifDGr3ebjSnDv5rUA",
+        "name": "Kohigashi Hitona",
+        "affiliates": "hanayori"
     },
     {
-        "id":"UCC0i9nECi4Gz7TU63xZwodg",
-        "name":"Shirayuki Mishiro",
-        "affiliates":"noripro"
+        "id": "UCyIcOCH-VWaRKH9IkR8hz7Q",
+        "name": "Hanamaru Hareru",
+        "affiliates": "hanayori"
     },
     {
-        "id":"UCJCzy0Fyrm0UhIrGQ7tHpjg",
-        "name":"Milk Enomiya",
-        "affiliates":"noripro"
+        "id": "UC8NZiqKx6fsDT3AVcMiVFyA",
+        "name": "Inuyama Tamaki",
+        "affiliates": "noripro"
     },
     {
-        "id":"UCrhx4PaF3uIo9mDcTxHnmIg",
-        "name":"Paryi",
-        "affiliates":"paryiproject"
+        "id": "UCC0i9nECi4Gz7TU63xZwodg",
+        "name": "Shirayuki Mishiro",
+        "affiliates": "noripro"
     },
     {
-        "id":"UCWCc8tO-uUl_7SJXIKJACMw",
-        "name":"Kagura Mea",
-        "affiliates":"paryiproject"
+        "id": "UCJCzy0Fyrm0UhIrGQ7tHpjg",
+        "name": "Milk Enomiya",
+        "affiliates": "noripro"
     },
     {
-        "id":"UC1pR2ig6NhndhvicEgclNdA",
-        "name":"Pinky Pop Hepburn",
-        "affiliates":"vic"
+        "id": "UCrhx4PaF3uIo9mDcTxHnmIg",
+        "name": "Paryi",
+        "affiliates": "paryiproject"
     },
     {
-        "id":"UCQYADFw7xEJ9oZSM5ZbqyBw",
-        "name":"Kaguya Luna",
-        "affiliates":"vic"
+        "id": "UCWCc8tO-uUl_7SJXIKJACMw",
+        "name": "Kagura Mea",
+        "affiliates": "paryiproject"
     },
     {
-        "id":"UCajhBT4nMrg3DLS-bLL2RCg",
-        "name":"Amano Pikamee",
-        "affiliates":"voms"
+        "id": "UC1pR2ig6NhndhvicEgclNdA",
+        "name": "Pinky Pop Hepburn",
+        "affiliates": "vic"
     },
     {
-        "id":"UC3vzVK_N_SUVKqbX69L_X4g",
-        "name":"Tomoshika Hikasa",
-        "affiliates":"voms"
+        "id": "UCQYADFw7xEJ9oZSM5ZbqyBw",
+        "name": "Kaguya Luna",
+        "affiliates": "vic"
     },
     {
-        "id":"UCaFhsCKSSS821N-EcWmPkUQ",
-        "name":"Jitomi Monoe",
-        "affiliates":"voms"
+        "id": "UCajhBT4nMrg3DLS-bLL2RCg",
+        "name": "Amano Pikamee",
+        "affiliates": "voms"
     },
     {
-        "id":"UCt30jJgChL8qeT9VPadidSw",
-        "name":"Shigure Ui",
-        "affiliates":"solovtuber"
+        "id": "UC3vzVK_N_SUVKqbX69L_X4g",
+        "name": "Tomoshika Hikasa",
+        "affiliates": "voms"
     },
     {
-        "id":"UCbfv8uuUXt3RSJGEwxny5Rw",
-        "name":"Kagura Nana",
-        "affiliates":"solovtuber"
+        "id": "UCaFhsCKSSS821N-EcWmPkUQ",
+        "name": "Jitomi Monoe",
+        "affiliates": "voms"
     },
     {
-        "id":"UC0qt9BfrpQo-drjuPKl_vdA",
-        "name":"rurudo",
+        "id": "UCt30jJgChL8qeT9VPadidSw",
+        "name": "Shigure Ui",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UCbfv8uuUXt3RSJGEwxny5Rw",
+        "name": "Kagura Nana",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UC0qt9BfrpQo-drjuPKl_vdA",
+        "name": "rurudo",
         "affiliates": "solotuber"
     },
     {
@@ -162,6 +172,216 @@
     {
         "name": "Kurumi Noah",
         "id": "UCIcAj6WkJ8vZ7DeJVgmeqKw",
-        "affiliates": "lupinusvg"
+        "affiliates": "irisbg"
+    },
+    {
+        "name": "Hinano Tachibana",
+        "id": "UCvUc0m317LWTTPZoBQV479A",
+        "affiliates": "irisbg"
+    },
+    {
+        "name": "Hanabusa Lisa",
+        "id": "UCurEA8YoqFwimJcAuSHU0MQ",
+        "affiliates": "cattleyarg"
+    },
+    {
+        "name": "Tosaki Mimi",
+        "id": "UCnvVG9RbOW3J6Ifqo-zKLiw",
+        "affiliates": "cattleyarg"
+    },
+    {
+        "name": "Asumi Sena",
+        "id": "UCF_U2GCKHvDz52jWdizppIA",
+        "affiliates": "cattleyarg"
+    },
+    {
+        "id": "UC8BS2IrE9NmxKLX7ObRVyxQ",
+        "name": "Animare Cafe",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCRvpMpzAXBRKJQuk-8-Sdvg",
+        "name": "Hinokuma Ran",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UC0Owc36U9lOyi9Gx9Ic-4qg",
+        "name": "Haneru Inaba",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UC2kyQhzGOB-JPgcQX9OMgEw",
+        "name": "Souya Ichika",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCXp7sNC0F_qkjickvlYkg-Q",
+        "name": "Kazami Kuku",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCW8WKciBixmaqaGqrlTITRQ",
+        "name": "Yunohara Izumi",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCOgONfZgrG2g0jntQKa6cDw",
+        "name": "Haibara Akane",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCTsEofJvQymp0Dcd4wYBmVQ",
+        "name": "Momono Yurari",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCtzCQnCT9E4o6U3mHHSHbQQ",
+        "name": "Mimi Shiromiya",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UC_BlXOQe5OcRC7o0GX8kp8A",
+        "name": "Hashiba Natsumi",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UChqYnJlFxlBi6DfRz6jRenQ",
+        "name": "Hinako Umori",
+        "affiliates": "animare"
+    },
+    {
+        "id": "UCDh2bWI5EDu7PavqwICkVpA",
+        "name": "Mico",
+        "affiliates": "honeystrap"
+    },
+    {
+        "id": "UCeLzT-7b2PBcunJplmWtoDg",
+        "name": "Patra",
+        "affiliates": "honeystrap"
+    },
+    {
+        "id": "UCYTz3uIgwVY3ZU-IQJS8r3A",
+        "name": "Charlotte",
+        "affiliates": "honeystrap"
+    },
+    {
+        "id": "UCwePpiw1ocZRSNSkpKvVISw",
+        "name": "Mary",
+        "affiliates": "honeystrap"
+    },
+    {
+        "id": "UC3UKMRQmBcjXWu66cvxcngA",
+        "name": "Eli",
+        "affiliates": "honeystrap"
+    },
+    {
+        "id": "UCoieZAlwgK3uLkIYiJARDQw",
+        "name": "SugarLyric Official",
+        "affiliates": "sugarlyric"
+    },
+    {
+        "id": "UC--A2dwZW7-M2kID0N6_lfA",
+        "name": "Chris Shishio",
+        "affiliates": "sugarlyric"
+    },
+    {
+        "id": "UC2hc-00y-MSR6eYA4eQ4tjQ",
+        "name": "Rene Ryugasaki",
+        "affiliates": "sugarlyric"
+    },
+    {
+        "id": "UCvPPBoTOor5gm8zSlE2tg4w",
+        "name": "Anna Kojo",
+        "affiliates": "sugarlyric"
+    },
+    {
+        "id": "UCr83W-PdmmbstrvnCn9kdZQ",
+        "name": "VTuber Apart Official",
+        "affiliates": "vapart"
+    },
+    {
+        "id": "UC3EhsuKdEkI99TWZwZgWutg",
+        "name": "Ando Uge",
+        "affiliates": "vapart"
+    },
+    {
+        "id": "UCL-2thbJ7grC9fmGF4OLuTg",
+        "name": "Camomi Camomi",
+        "affiliates": "vapart"
+    },
+    {
+        "id": "UChXm-xAYPfygrbyLo2yCASQ",
+        "name": "Anko Kisaki",
+        "affiliates": "vapart"
+    },
+    {
+        "id": "UCmqrvfLMws-GLGHQcB5dasg",
+        "name": "Kanon Kanade",
+        "affiliates": "vapart"
+    },
+    {
+        "id": "UCO2sK7tl5-mdxOTehuPphew",
+        "name": "Gato Channel",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UCPzlCaUmR2MFfIjpmosMM0A",
+        "name": "Kusunoki Sio",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UCiBXVFuA-IPRrmb9r5cTT2w",
+        "name": "LOLO",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UCEK-P4R5WjgXEJyt7GlBeZQ",
+        "name": "littleflower",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UCAr7rLi_Wn09G-XfTA07d4g",
+        "name": "Tenjin Kotone",
+        "affiliates": "solovtuber"
+    },
+    {
+        "id": "UCLhUvJ_wO9hOvv_yYENu4fQ",
+        "name": "Siro",
+        "affiliates": "dotlive"
+    },
+    {
+        "id": "UCkD-wlU06zeiGSk31y2qIOw",
+        "name": "Siro Games",
+        "affiliates": "dotlive"
+    },
+    {
+        "id": "UCz6Gi81kE6p5cdW1rT0ixqw",
+        "name": "Mememe Mokota",
+        "affiliates": "dotlive"
+    },
+    {
+        "id": "UC1519-d1jzGiL1MPTxEdtSA",
+        "name": "Natori Yaezawa",
+        "affiliates": "dotlive"
+    },
+    {
+        "id": "UCIu-aUArYq_H84dBpCAokMA",
+        "name": "Shirayuki Reid",
+        "affiliates": "vgaming"
+    },
+    {
+        "id": "UCbFwe3COkDrbNsbMyGNCsDg",
+        "name": "A.I.Games",
+        "affiliates": "kizunaai"
+    },
+    {
+        "id": "UC4YaOt1yT-ZeyB0OmxHgolA",
+        "name": "A.I.Channel",
+        "affiliates": "kizunaai"
+    },
+    {
+        "id": "UCYm8zALd2uHqyy6C1tb4_zA",
+        "name": "love-pii channel",
+        "affiliates": "kizunaai"
     }
 ]

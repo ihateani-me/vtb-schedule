@@ -35,6 +35,26 @@
         "affiliates": "hololive"
     },
     {
+        "id": "kanadeizuru",
+        "name": "Kanade Izuru",
+        "affiliates": "holostars"
+    },
+    {
+        "id": "arurandeisu",
+        "name": "Arurandeisu",
+        "affiliates": "holostars"
+    },
+    {
+        "id": "rikkaroid",
+        "name": "Rikka",
+        "affiliates": "holostars"
+    },
+    {
+        "id": "astelleda",
+        "name": "Astel Leda",
+        "affiliates": "holostars"
+    },
+    {
         "id": "udukikohh",
         "name": "Kou Uzuki",
         "affiliates": "nijisanji"
