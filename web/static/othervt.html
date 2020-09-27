@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>ihateanime API // Other VTubers Listing</title>
+    <meta property="og:locale" content="en_US">
+    <meta name="description" content="VTubers that are streaming on YouTube/Twitch!">
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" href="/favicon.ico" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <style>
+        :root {
+            --darkmode-bg: #2d2d2d;
+            --darkmode-text: #bdbdbd;
+        }
+
+        .navbar {
+            background-color: #e0e0e0;
+        }
+
+        .vthellnav {
+            list-style-type: none;
+            padding: unset;
+        }
+        .vthellnav > li > i {
+            padding-right: .5rem;
+        }
+        .float {
+            position: fixed!important;
+            width: 40px !important;
+            height: 40px !important;
+            bottom: 40px !important;
+            right: 40px !important;
+            border-radius: 50px !important;
+            text-align: center !important;
+            background-color: #2b2b2b;
+            color: #d2d2d2;
+        }
+        .my-float {
+            font-size: 30px !important;
+            margin: 5px 10px 10px !important;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--darkmode-bg) !important;
+                color: var(--darkmode-text);
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p {
+                color: var(--darkmode-text) !important;
+            }
+
+            hr {
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .float {
+                background-color: #d2d2d2 !important;
+                color: #2b2b2b !important;
+            }
+
+            .text-muted {
+                color: #8c8c8c !important;
+            }
+
+            .mb-2 {
+                color: #dcdcdc !important;
+            }
+
+            a,
+            a:hover {
+                color: #3dcc6f;
+            }
+
+            .text-danger {
+                color: #e64757 !important;
+            }
+
+            span#basic-addon1 {
+                background-color: #343a40 !important;
+                color: #fffff3 !important;
+                border-color: #454d55 !important;
+            }
+
+            input.form-control {
+                background-color: #222529 !important;
+                color: #bdbdbd !important;
+                border-color: #454d55 !important;
+            }
+
+            input.form-control:focus {
+                color: #bdbdbd !important;
+            }
+
+            .jumbotron {
+                background-color: #404040 !important;
+            }
+
+            .alert-dark {
+                color: #ffffff !important;
+                background-color: #343a40 !important;
+                border-color: #454d55 !important;
+            }
+
+            .card {
+                background-color: #424242;
+                border: 1px solid rgba(0, 0, 0, 0.125);
+            }
+
+            .list-group-item {
+                background-color: #3a3a3a;
+                border: 1px solid rgba(243, 243, 243, 0.26);
+            }
+
+            .navbar {
+                background-color: #424242;
+            }
+            .vthellnav > li > a {
+                color:rgb(236, 236, 236);
+            }
+
+            .table-bordered thead td, .table-bordered thead th {
+                color: white;
+            }
+
+            .table-bordered td, .table-bordered th {
+                color: #bfbfbf;
+            }
+        }
+    </style>
+</head>
+<body class="container" style="height: 100vh; display: flex; flex-direction: column;">
+    <header>
+        <h1 id="heading" class="mt-4">Other VTuber List</h1>
+    </header>
+    <h4 class="text-monospace"><a href="/other/youtube/live">YouTube</a></h4>
+    <table id="vtyt-list" class="table table-bordered"></table>
+    <hr>
+    <h4 class="text-monospace"><a href="/twitch/live">Twitch</a></h4>
+    <table id="vttwitch-list" class="table table-bordered"></table>
+    <a id="goToTop" class="float"><i class="fa fa-caret-up my-float" aria-hidden="true"></i></a>
+    <script>
+        "use strict"
+
+        const $vtyt = $("#vtyt-list");
+        const $vttw = $("#vttwitch-list");
+
+        var already_parsed = [];
+
+        var height = $(window).scrollTop();
+        if (height < 101) {
+            $("#goToTop").hide();
+        }
+
+        $(window).scroll(function() {
+            var height = $(window).scrollTop();
+            if (height > 100) {
+                $('#goToTop').fadeIn();
+            } else {
+                $('#goToTop').fadeOut();
+            }
+        });
+        $(document).ready(function() {
+            $("#goToTop").click(function(event) {
+                event.preventDefault();
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                return false;
+            });
+        });
+
+		function generate_table(dataset, is_twitch = false) {
+			var $thead = $("<thead />");
+            var subsname = "Subscribers"
+            if (is_twitch) {
+                subsname = "Followers"
+            }
+			$thead.append(
+				$("<tr />")
+					.append($(`<th scope "col" />`).text("ID"))
+					.append($(`<th scope "col" />`).text("Name"))
+					.append($(`<th scope "col" />`).text(subsname))
+					.append($(`<th scope "col" />`).text("Views"))
+			);
+			var $tbody = $("<tbody />");
+			dataset.forEach(function (val, index) {
+                if (!already_parsed.includes(val.id)) {
+                    var $img_row = $(`<img class="img-fluid" />`);
+                    $img_row.attr("src", val.thumbnail);
+                    $img_row.attr("width", 75);
+                    $img_row.attr("height", 75);
+                    $img_row.attr("alt", val.id);
+                    var $namelink = $("<a />");
+                    $namelink.text(val.name);
+                    var subscount = "Unknown";
+                    if (val.hasOwnProperty("subscriberCount")) {
+                        subscount = `${val.subscriberCount.toLocaleString()} subs`;
+                        $namelink.attr("href", `https://www.youtube.com/channel/${val.id}`);
+                    } else if (val.hasOwnProperty("followerCount")) {
+                        subscount = `${val.followerCount.toLocaleString()} follows`;
+                        $namelink.attr("href", `https://twitch.tv/${val.id}`);
+                    };
+                    $tbody.append(
+                        $("<tr />")
+                            .append($(`<th scope="row" class="text-center" />`).append($img_row))
+                            .append($(`<th />`).append($namelink))
+                            .append($(`<th />`).text(subscount))
+                            .append($(`<th />`).text(`${val.viewCount.toLocaleString()} views`))
+                    );
+                    already_parsed.push(val.id);
+                }
+			});
+            return [$thead, $tbody];
+		}
+
+        $.getJSON("/other/youtube/channels", function (parsed) {
+            var [$head, $body] = generate_table(parsed.channels);
+            $vtyt.append($head);
+            $vtyt.append($body);
+            $vtyt.fadeIn();
+        });
+
+        $.getJSON("/twitch/channels", function (parsed) {
+            var [$head, $body] = generate_table(parsed.channels, true);
+            $vttw.append($head);
+            $vttw.append($body);
+            $vttw.fadeIn();
+        });
+    </script>
+</body>
+</html>
