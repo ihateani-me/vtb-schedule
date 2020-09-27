@@ -17,7 +17,11 @@ from .models import (
     OtherBiliDB,
     OtherYTDB,
     TwitcastingDB,
+    TwitcastingChannelsDB,
     TwitchDB,
+    TwitchChannelsDB,
+    NijiTubeChannels,
+    NijiTubeLive,
 )
 
 # Import sanic_openapi models
@@ -28,6 +32,7 @@ from .models import (
     TwitcastLiveModel,
     TwitchChannelModel,
     TwitchLiveModel,
+    YouTubeChannelModel,
     YouTubeScheduleModel,
 )
 
@@ -46,4 +51,8 @@ from .dbconn import (
     otheryt_channels_data,
     twitcast_channels_data,
     twitch_channels_data,
+    fetch_nijitube_live,
+    fetch_nijitube_channels,
+    parse_youtube_live_args,
+    parse_youtube_channel_args,
 )
