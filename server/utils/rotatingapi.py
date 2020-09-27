@@ -22,7 +22,7 @@ class RotatingAPIKey:
         :param minute_rate: A rotation rate in minutes, defaults to 60 minutes
         :type minute_rate: int, optional
         """
-        self.logger = logging.getLogger("rotatingapi")
+        self.logger = logging.getLogger("utils.rotatingapi.RotatingAPIKey")
         if isinstance(api_keys, str):
             api_keys = [api_keys]
         self._api_keys = collections.deque(api_keys)

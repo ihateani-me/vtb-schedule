@@ -11,12 +11,30 @@ from motor.motor_asyncio import (
 
 class VTBiliDatabase:
     def __init__(self, mongodb_url: str, mongodb_dbname: str = "vtbili"):
-        self.logger = logging.getLogger("vtbili_dbconn")
+        self.logger = logging.getLogger("utils.mongoconn.VTBiliDatabase")
+        self._mongo_url = mongodb_url
+        self._mongo_db_name = mongodb_dbname
         self.logger.info("Connecting to database...")
-        self._dbclient: AsyncIOMotorClient = AsyncIOMotorClient(mongodb_url)
-        self._vtdb: AsyncIOMotorDatabase = self._dbclient[mongodb_dbname]
+        self._dbclient: AsyncIOMotorClient = AsyncIOMotorClient(self._mongo_url)
+        self._vtdb: AsyncIOMotorDatabase = self._dbclient[self._mongo_db_name]
         self._locked = False
+        self._is_resetting = False
+        self._error_rate = 0
         self.logger.info("Connected!")
+
+    async def reset_connection(self):
+        self._is_resetting = True
+        self.logger.warning("Resetting client connection...")
+        self._dbclient.close()
+        self.logger.info("Reconnecting to database...")
+        self._dbclient: AsyncIOMotorClient = AsyncIOMotorClient(self._mongo_url)
+        self._vtdb: AsyncIOMotorDatabase = self._dbclient[self._mongo_db_name]
+        self.logger.info("Reconnected!")
+        self._error_rate = 0
+        self._is_resetting = False
+
+    def raise_error(self):
+        self._error_rate += 1
 
     @property
     def is_locked(self) -> bool:
@@ -24,7 +42,7 @@ class VTBiliDatabase:
 
     async def acquire(self):
         while True:
-            if not self._locked:
+            if not self._locked and not self._is_resetting:
                 break
             await asyncio.sleep(1)
         self._locked = True

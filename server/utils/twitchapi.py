@@ -14,13 +14,13 @@ class TwitchHelix:
     def __init__(self, client_id, client_secret, loop=None):
         if not loop:
             loop = asyncio.get_event_loop()
-        self.logger = logging.getLogger("twitch_helix")
+        self.logger = logging.getLogger("utils.twitchapi.TwitchHelix")
         self._bearer_token = None
         self._expires = 0
         self._cid = client_id
         self._csc = client_secret
         self._sess = aiohttp.ClientSession(
-            headers={"User-Agent": "VTBSchedule/0.6.2"}, loop=loop
+            headers={"User-Agent": "VTBSchedule/0.9.0"}, loop=loop
         )
         self._authorized = False
 
