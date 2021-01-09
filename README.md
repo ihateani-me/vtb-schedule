@@ -1,4 +1,8 @@
+# Not Maintaned
+Rewritten in TypeScript here: [vtscheduler-ts](https://github.com/ihateani-me/vtscheduler-ts)
+
 # VTBili Schedule API and Webserver
+
 A wrapper around BiliBili Calendar (Scheduling system) into a readable API.<br>
 *(Oh, also some Youtube channels, I guess)*
 
