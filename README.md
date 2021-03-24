@@ -1,7 +1,9 @@
 # Not Maintaned
-Rewritten in TypeScript here: [vtscheduler-ts](https://github.com/ihateani-me/vtscheduler-ts)
+Rewritten in TypeScript here: https://github.com/ihateani-me/vtscheduler-ts (Backend) and here: https://github.com/ihateani-me/ihaapi-ts (Frontend)
 
-# VTBili Schedule API and Webserver
+---
+
+## VTBili Schedule API and Webserver
 
 A wrapper around BiliBili Calendar (Scheduling system) into a readable API.<br>
 *(Oh, also some Youtube channels, I guess)*
@@ -12,9 +14,9 @@ A wrapper around BiliBili Calendar (Scheduling system) into a readable API.<br>
 
 Still WIP!
 
-**Currently running on:** [api.ihateani.me](https://api.ihateani.me)
+~~**Currently running on:** [api.ihateani.me](https://api.ihateani.me)~~
 
-## Setup
+### Setup
 1. Install MongoDB on your server
 2. Modify `init_db.py` `MONGODB_URL` variable to your IP and PORT
 3. Execute `init_db.py` to populate your DB.
